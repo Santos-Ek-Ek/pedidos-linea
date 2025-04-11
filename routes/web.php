@@ -79,3 +79,18 @@ Route::prefix('administrador')->group(function () {
     Route::post('/register', [authAdminController::class, 'register'])->name('admin.register.submit');
 });
 
+Route::get('/tickets/{filename}', function ($filename) {
+    $path = public_path('tickets/'.$filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="ticket_pedido.pdf"'
+    ]);
+})->name('tickets.download');
+
+Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
+     ->name('tickets.show');

@@ -19,7 +19,8 @@ class pedidos extends Model
         'metodo_entrega',
         'metodo_pago',
         'estado',
-        'cantidad'
+        'cantidad',
+        'ticket_path'
     ];
     
     public function producto()

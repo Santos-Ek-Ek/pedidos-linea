@@ -153,7 +153,7 @@
                                                                     </div>
                                                                     <div class="mb-32">
                                                                         <h6 class="mb-8">Contactanos</h6>
-                                                                        <p class="lead dark-gray mb-16"><span><a href="tel:123456789">+52 999 109 6674</a> ,</span> <span> <a href="tel:123456789">+1 (555) 987-6543</a></span></p>
+                                                                        <p class="lead dark-gray mb-16"><span><a href="tel:123456789">+52 999 109 6674</a></span></p>
                                                                         <a class="lead dark-gray mb-16" href="mailto:info@example.com">gilmereb37@gmail.com</a>
                                                                         <p class="lead dark-gray">Calle 21a X20 Y 22 Centro Cacalchén, Yucatán, México</p>
                                                                     </div>
@@ -212,7 +212,14 @@
 
                     <!-- Start Page Content -->
                     <div class="page-content">  
-
+                    @if(session('ticket'))
+    <div class="alert alert-success">
+        Pedido realizado con éxito. 
+        <a href="{{ route('tickets.download', session('ticket')) }}" target="_blank">
+            Descargar comprobante
+        </a>
+    </div>
+@endif
                         <!-- Shop Section Start -->    
                         <section class="py-80">
                             <div class="container-fluid">

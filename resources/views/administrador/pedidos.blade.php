@@ -70,7 +70,18 @@
                       <td>{{$pedido->horario_entrega}}</td>
                       <td>  <div style="max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{$pedido->metodo_pago}}</div></td>
                       <td>{{$pedido->total}}</td>
-                      <td>{{$pedido->estado}}</td>
+                      <td>{{$pedido->estado}}
+                      @if($pedido->ticket_path)
+        <a href="{{ asset($pedido->ticket_path) }}" 
+           target="_blank" 
+           class="ticket-link"
+           title="Ver ticket">
+            <i class="fas fa-file-pdf"></i> Ver
+        </a>
+    @else
+        <span class="text-muted">No generado</span>
+    @endif
+                      </td>
                       <td>
                 
                       <button class="btn btn-outline-success change-status" data-id="" data-status="" style="align-items: center; margin-left:10px;">
