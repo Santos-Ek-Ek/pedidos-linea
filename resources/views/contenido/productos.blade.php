@@ -39,7 +39,6 @@
                 <span data-text="Z">Z</span>
                 <span data-text="A">A</span>
             </div>
-            <img src="assets/media/icons/logo-vector.png" alt="" class="logo-bottom-vector">
         </div>
 
         <!--  Begin scroll container -->

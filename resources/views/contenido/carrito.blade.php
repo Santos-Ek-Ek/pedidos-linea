@@ -29,17 +29,16 @@
         <!-- Preloader -->
         <div id="preloader">
             <div class="loading">
-                <span data-text="R">R</span>
-                <span data-text="O">O</span>
-                <span data-text="Y">Y</span>
-                <span data-text="A">A</span>
                 <span data-text="L">L</span>
-                <span data-text="F">F</span>
                 <span data-text="A">A</span>
-                <span data-text="R">R</span>
+                <span data-text="T">T</span>
                 <span data-text="E">E</span>
+                <span data-text="R">R</span>
+                <span data-text="R">R</span>
+                <span data-text="A">A</span>
+                <span data-text="Z">Z</span>
+                <span data-text="A">A</span>
             </div>
-            <img src="assets/media/icons/logo-vector.png" alt="" class="logo-bottom-vector">
         </div>
 
         <!--  Begin scroll container -->
@@ -66,8 +65,8 @@
                                     <!-- Begin overlay menu toggle button -->
                                     <div id="ui-ol-menu-toggle-btn-wrap">
                                         <div class="ui-ol-menu-toggle-btn-text">
-                                            <span class="text-menu" data-hover="Open">Menu</span>
-                                            <span class="text-close">Close</span>
+                                            <span class="text-menu" data-hover="Abrir">Menu</span>
+                                            <span class="text-close">Cerrar</span>
                                         </div>
                                         <div class="ui-ol-menu-toggle-btn-holder">
                                             <a href="#" class="ui-ol-menu-toggle-btn"><span></span></a>
@@ -93,25 +92,31 @@
 
                                                                     <li class="ui-ol-submenu-wrap">
                                                                         <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Home</a>
+                                                                            <a href="#">Inicio</a>
                                                                             <div class="ui-ol-submenu-caret-wrap">
                                                                                 <div class="ui-ol-submenu-caret"></div>
                                                                             </div> 
-                                                                        </div> 
+                                                                        </div>
                                                                         <div class="ui-ol-submenu">
                                                                             <ul class="ui-ol-submenu-list">
-                                                                                <li><a href="index-2.html">Home 1</a></li>
-                                                                                <li><a href="index-3.html">Home 2</a></li>
+                
+                                                                                <!-- Begin submenu -->
+                                                                                <li class="ui-ol-submenu-wrap">
+
+                                                                                        <a href="inicio" class="ui-ol-submenu-link">Principal</a>
+
+
+                                                                                </li>
+
+                                                                                
                                                                             </ul>
                                                                         </div> 
                                                                     </li>
 
-                                                                    <li><a href="about.html">About Us</a></li>
-
                                                                     <!-- Begin submenu (submenu master) -->
                                                                     <li class="ui-ol-submenu-wrap">
                                                                         <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Shop</a>
+                                                                            <a href="#">Ventas</a>
                                                                             <div class="ui-ol-submenu-caret-wrap">
                                                                                 <div class="ui-ol-submenu-caret"></div>
                                                                             </div>
@@ -122,77 +127,18 @@
                                                                                 <!-- Begin submenu -->
                                                                                 <li class="ui-ol-submenu-wrap">
 
-                                                                                        <a href="productosVenta" class="ui-ol-submenu-link">Products</a>
+                                                                                        <a href="productosVenta" class="ui-ol-submenu-link">Productos</a>
 
 
                                                                                 </li>
-                                                                                <li><a href="product-detail.html">Product Detail</a></li>
-                                                                                <!-- Begin submenu -->
-                                                                                <li class="ui-ol-submenu-wrap">
-                                                                                    <div class="ui-ol-submenu-trigger">
-                                                                                        <a href="#" class="ui-ol-submenu-link">Product Ordering</a>
-                                                                                        <div class="ui-ol-submenu-caret-wrap">
-                                                                                            <div class="ui-ol-submenu-caret"></div>
-                                                                                        </div> 
-                                                                                    </div> 
-                                                                                    <div class="ui-ol-submenu">
-                                                                                        <ul class="ui-ol-submenu-list">
-                                                                                            <li><a href="cart.html">Cart</a></li>
-                                                                                            <li><a href="checkout.html">Checkout</a></li>
-                                                                                            <li><a href="wishlist.html">Wishlist</a></li>
-                                                                                            <li><a href="order-tracking.html">Order Tracking</a></li>
-                                                                                        </ul>
-                                                                                    </div>
-                                                                                </li>
-                                                                                <!-- End submenu -->
+
                                                                                 
                                                                             </ul>
                                                                         </div> 
                                                                     </li>
                                                                     <!-- End submenu (sub-master) -->
-
-                                                                    <!-- Begin submenu (submenu master) -->
-                                                                    <li class="ui-ol-submenu-wrap">
-                                                                        <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Blogs</a>
-                                                                            <div class="ui-ol-submenu-caret-wrap">
-                                                                                <div class="ui-ol-submenu-caret"></div>
-                                                                            </div> 
-                                                                        </div>
-                                                                        <div class="ui-ol-submenu">
-                                                                            <ul class="ui-ol-submenu-list">
-                                                                                <li><a href="blog-grid.html">Blog Grid</a></li>
-                                                                                <li><a href="blog-grid-left-sidebar.html">Blog Grid (Sidebar Left)</a></li>
-                                                                                <li><a href="blog-grid-right-sidebar.html">Blog Grid (Sidebar Right)</a></li>
-                                                                                <li><a href="blog-list.html">Blog List</a></li>
-                                                                                <li><a href="blog-detail.html">Blog Detail</a></li>
-                                                                            </ul>
-                                                                        </div> 
-                                                                    </li>
-                                                                    <!-- End submenu (sub-master) -->
-
-                                                                    <!-- Begin submenu (submenu master) -->
-                                                                    <li class="ui-ol-submenu-wrap active">
-                                                                        <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Pages</a>
-                                                                            <div class="ui-ol-submenu-caret-wrap">
-                                                                                <div class="ui-ol-submenu-caret"></div>
-                                                                            </div> 
-                                                                        </div>
-                                                                        <div class="ui-ol-submenu">
-                                                                            <ul class="ui-ol-submenu-list">
-                                                                                <li><a href="menu.html">Menu</a></li>
-                                                                                <li><a href="team.html">Team</a></li>
-                                                                                <li class="active"><a href="login.html">Login</a></li>
-                                                                                <li><a href="register">Signup</a></li>
-                                                                                <li><a href="404.html">404 Page</a></li>
-                                                                                <li><a href="coming-soon.html">Coming Soon</a></li>
-                                                                            </ul>
-                                                                        </div> 
-                                                                    </li>
-                                                                    <!-- End submenu (sub-master) -->
                 
-                                                                    <li><a href="contact-us.html">Contact</a></li>
+                                                                    <li><a href="contact-us.html">Contactanos</a></li>
                 
                                                                 </ul>
                                                                 <!-- End menu list -->
@@ -201,14 +147,14 @@
                                                                 <div class="company-info">
                                                                     <img src="assets/media/vector/menu-vector.png" alt="" class="vector">
                                                                     <div class="mb-32">
-                                                                        <h6 class="color-primary mb-8">Opening Hours</h6>
-                                                                        <p class="lead dark-gray">Every Day 09:00am to 10PM:00pm</p>
+                                                                        <h6 class="color-primary mb-8">Horario</h6>
+                                                                        <p class="lead dark-gray">Todos los dias de 09:00am a 11:00pm</p>
                                                                     </div>
                                                                     <div class="mb-32">
-                                                                        <h6 class="mb-8">Contact Us</h6>
-                                                                        <p class="lead dark-gray mb-16"><span><a href="tel:123456789">+1 (555) 123-4567</a> ,</span> <span> <a href="tel:123456789">+1 (555) 987-6543</a></span></p>
-                                                                        <a class="lead dark-gray mb-16" href="mailto:info@example.com">email@example.com</a>
-                                                                        <p class="lead dark-gray">456 Trendy Street, Sydney, NSW 2000, USA.</p>
+                                                                        <h6 class="mb-8">Contactanos</h6>
+                                                                        <p class="lead dark-gray mb-16"><span><a href="tel:123456789">+52 999 109 6674</a></span></p>
+                                                                        <a class="lead dark-gray mb-16" href="mailto:info@example.com">gilmereb37@gmail.com</a>
+                                                                        <p class="lead dark-gray">Calle 21a X20 Y 22 Centro Cacalchén, Yucatán, México</p>
                                                                     </div>
                                                                     <ul class="social-icons-list unstyled">
                                                                         <li><a href="#"><img src="assets/media/icons/Facebook.svg" alt=""></a></li>
@@ -238,7 +184,7 @@
             <li><a class="dropdown-item" href="">Mi Cuenta</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logoutUser') }}">
                     @csrf
                     <button type="submit" class="dropdown-item">Cerrar Sesión</button>
                 </form>
@@ -365,85 +311,46 @@
 
         <!-- Mini Cart Start -->
         <aside id="sidebar-cart">
-            <div class="d-flex align-items-center justify-content-between mb-32">
-                <h5>Your Cart</h5>
-                <a href="#" class="close-button"><i class="fa-regular fa-xmark close-icon"></i></a>
-            </div>
-            <div class="vr-line mb-32"></div>
-            <ul class="product-list">
-                <li class="product-item mb-24">
-                    <a href="product-detail.html">
-                        <span class="item-image">
-                            <img src="assets/media/products/mc_1.png" alt="Product Photo">
-                        </span>
-                    </a>
-                    <div class="product-text">
-                        <a href="product-detail.html">
-                            <h6 class="mb-16 dark-gray">Crunch Grillhouse</h6>
-                        </a>
-                        <div class="qp_row">
-                            <div class="quantity quantity-wrap">
-                                <div class="decrement"><i class="fa-solid fa-dash"></i></div>
-                                <input type="text" name="quantity" value="1" maxlength="2" size="1" class="number">
-                                <div class="increment"><i class="fa-solid fa-plus-large"></i></div>
-                            </div>
-                            <h5 class="dark-gray">$240</h5>
-                        </div>
-                    </div>
-                </li>
-                <li class="vr-line mb-24"></li>
-                <li class="product-item mb-24">
-                    <a href="product-detail.html">
-                        <span class="item-image">
-                            <img src="assets/media/products/mc_2.png" alt="Product Photo">
-                        </span>
-                    </a>
-                    <div class="product-text">
-                        <a href="product-detail.html">
-                            <h6 class="mb-16 dark-gray">Crunch Grillhouse</h6>
-                        </a>
-                        <div class="qp_row">
-                            <div class="quantity quantity-wrap">
-                                <div class="decrement"><i class="fa-solid fa-dash"></i></div>
-                                <input type="text" name="quantity" value="2" maxlength="2" size="1" class="number">
-                                <div class="increment"><i class="fa-solid fa-plus-large"></i></div>
-                            </div>
-                            <h5 class="dark-gray">$240</h5>
-                        </div>
-                    </div>
-                </li>
-                
-            </ul>
-            <div class="price-total mb-24">
-                <h6>Subtotal</h6>
-                <h5 class="color-primary">$281.98</h5>
-            </div>
-            <div class="vr-line mb-24"></div>
-            <div class="action-buttons">
-                <a href="carrito" class="cus-btn outline">
-                    <span class="icon-wrapper">
-                        <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <svg class="icon-svg icon-svg-copy" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                    View Cart
-                </a>
-                <a href="checkout.html" class="cus-btn dark">
-                    <span class="icon-wrapper">
-                        <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <svg class="icon-svg icon-svg-copy" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                    Checkout
-                </a>
-            </div>
-        </aside>
+    <div class="d-flex align-items-center justify-content-between mb-32">
+        <h5>Tu carrito</h5>
+        <a href="#" class="close-button"><i class="fa-regular fa-xmark close-icon"></i></a>
+    </div>
+    <div class="vr-line mb-32"></div>
+    <ul class="product-list" id="cart-items">
+        <!-- Los elementos del carrito se agregarán aquí dinámicamente -->
+        <li class="empty-cart-message">Tu carrito está vacío</li>
+    </ul>
+
+    <div class="price-total mb-24">
+        <h6>Subtotal</h6>
+        <h5 class="color-primary" id="cart-subtotal">$0.00</h5>
+    </div>
+    <div class="vr-line mb-24"></div>
+    <div class="action-buttons">
+        <a href="carrito" class="cus-btn outline">
+            <span class="icon-wrapper">
+                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg class="icon-svg icon-svg-copy" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            Ver carrito
+        </a>
+        <a href="checkout" class="cus-btn dark">
+            <span class="icon-wrapper">
+                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg class="icon-svg icon-svg-copy" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            Pagar
+        </a>
+    </div>
+</aside>
         <div id="sidebar-cart-curtain"></div>
         <!-- Mini Cart End -->
 
