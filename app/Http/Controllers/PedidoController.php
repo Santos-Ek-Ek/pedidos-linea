@@ -115,4 +115,13 @@ class PedidoController extends Controller
             'Content-Disposition' => 'inline; filename="ticket_pedido.pdf"'
         ]);
     }
+
+    public function updateStatus(Request $request, $id)
+{
+    $pedido = pedidos::findOrFail($id);
+    $pedido->estado = $request->estado;
+    $pedido->save();
+
+    return response()->json(['success' => true]);
+}
 }

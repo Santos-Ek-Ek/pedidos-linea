@@ -84,10 +84,14 @@
                       </td>
                       <td>
                 
-                      <button class="btn btn-outline-success change-status" data-id="" data-status="" style="align-items: center; margin-left:10px;">
-        <i class='fas fa-paper-plane d-flex'> Enviado</i>
+                      <button class="btn btn-outline-success change-status" 
+            data-id="{{ $pedido->id }}" 
+            data-status="{{ $pedido->estado === 'Enviado' ? 'Pendiente' : 'Enviado' }}" 
+            style="align-items: center; margin-left:10px;">
+        <i class='fas fa-paper-plane d-flex'> 
+            {{ $pedido->estado === 'Enviado' ? 'Marcar como Pendiente' : 'Marcar como Enviado' }}
+        </i>
     </button>
-
                 </td>
                     </tr>
                     @endforeach
@@ -128,6 +132,28 @@ document.getElementById('searchInput').addEventListener('keyup', function() {
     </script>
 
 <script>
+// En pedido.js
+$(document).on('click', '.change-status', function() {
+    const pedidoId = $(this).data('id');
+    const newStatus = $(this).data('status');
+    
+    $.ajax({
+        url: '/pedidos/' + pedidoId + '/update-status',
+        method: 'PUT',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            estado: newStatus
+        },
+        success: function(response) {
+            location.reload(); // Recargar para ver los cambios
+        },
+        error: function(xhr) {
+            alert('Error al actualizar el estado');
+        }
+    });
+});
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Función para filtrar por teléfono y estado
     function filterRows() {

@@ -91,3 +91,6 @@ Route::get('/tickets/{filename}', function ($filename) {
 
 Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
      ->name('tickets.show');
+
+     Route::put('/pedidos/{id}/update-status', [PedidoController::class, 'updateStatus'])
+     ->name('pedidos.updateStatus');
