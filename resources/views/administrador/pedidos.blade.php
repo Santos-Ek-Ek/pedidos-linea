@@ -84,14 +84,14 @@
                       </td>
                       <td>
                 
-                      <button class="btn btn-outline-success change-status" 
-            data-id="{{ $pedido->id }}" 
-            data-status="{{ $pedido->estado === 'Enviado' ? 'Pendiente' : 'Enviado' }}" 
-            style="align-items: center; margin-left:10px;">
-        <i class='fas fa-paper-plane d-flex'> 
-            {{ $pedido->estado === 'Enviado' ? 'Marcar como Pendiente' : 'Marcar como Enviado' }}
-        </i>
-    </button>
+                      <button class="btn {{ $pedido->estado === 'Enviado' ? 'btn-outline-warning' : 'btn-outline-success' }} change-status" 
+        data-id="{{ $pedido->id }}" 
+        data-status="{{ $pedido->estado === 'Enviado' ? 'Pendiente' : 'Enviado' }}" 
+        style="align-items: center; margin-left:10px;">
+    <i class='fas fa-paper-plane d-flex'> 
+        {{ $pedido->estado === 'Enviado' ? 'Marcar como Pendiente' : 'Marcar como Enviado' }}
+    </i>
+</button>
                 </td>
                     </tr>
                     @endforeach
