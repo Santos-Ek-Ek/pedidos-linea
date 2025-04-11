@@ -17,10 +17,10 @@
 
 <script src="{{ asset('js/pedido.js') }}"></script>
 <div class="container-fluid">
-<!-- <div class="form-group">
-    <label for="searchInput">Buscar por ID de transacción:</label>
-    <input type="text" class="form-control" id="searchInput" placeholder="Ingrese el ID de transacción">
-</div> -->
+<div class="form-group">
+    <label for="searchInput">Buscar por teléfono:</label>
+    <input type="text" class="form-control" id="searchInput" placeholder="Ingrese el número de teléfono">
+</div>
 <div class="form-check form-check-inline">
     <input class="form-check-input" type="checkbox" id="checkEnviados" value="ENVIADO">
     <label class="form-check-label" for="checkEnviados">Enviados</label>
@@ -69,7 +69,7 @@
                       <td>  <div style="max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{$pedido->metodo_entrega}}</div></td>
                       <td>{{$pedido->horario_entrega}}</td>
                       <td>  <div style="max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{$pedido->metodo_pago}}</div></td>
-                      <td>{{$pedido->total}}</td>
+                      <td>${{ number_format($pedido->total + ($pedido->metodo_entrega == 'Enviar a domicilio' ? 5 : 0), 2) }}</td>
                       <td>{{$pedido->estado}}
                       @if($pedido->ticket_path)
         <a href="{{ asset($pedido->ticket_path) }}" 
@@ -105,4 +105,22 @@
         </div>
       </div>
     </div>
+
+    <script>
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        const clientInfo = row.cells[6].textContent.toLowerCase(); // Celda que contiene "Tel: XXXXXXXX"
+        const phone = clientInfo.split('tel:')[1]?.trim().split(' ')[0] || ''; // Extrae solo el número
+        
+        if(phone.includes(searchValue)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+    </script>
 @endsection

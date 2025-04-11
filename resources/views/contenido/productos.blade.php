@@ -185,7 +185,7 @@
             <li><a class="dropdown-item" href="">Mi Cuenta</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logoutUser') }}">
                     @csrf
                     <button type="submit" class="dropdown-item">Cerrar Sesión</button>
                 </form>

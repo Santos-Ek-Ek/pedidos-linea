@@ -24,7 +24,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('loginUser');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submitUser');
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logoutUser');
 Route::get('/', function () {
     return redirect()->route('productosVenta');
 });
@@ -44,9 +44,6 @@ Route::post('/guardar-pedido', [PedidoController::class, 'store'])
 Route::get('/productosVenta', [ventaProductoController::class, 'index'])->name('productosVenta');
 
 
-Route::get('/login', function () {
-    return view('auth.login');
-});
 
 Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos']);
 
