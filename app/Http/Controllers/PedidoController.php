@@ -56,7 +56,9 @@ class PedidoController extends Controller
             ]);
         }
 auth()->user()->update([
-    'telefono' => $request->input('telefono')
+    'telefono' => $request->input('telefono'),
+    'direccion' => $request->input('direccion'),
+    'referencia_envio' => $request->input('referencias')
 ]);
     
         return redirect()->route('productosVenta')->with('success', 'Pedido realizado con éxito');

@@ -410,7 +410,7 @@
             </span>
             Ver carrito
         </a>
-        <a href="checkout.html" class="cus-btn dark">
+        <a href="checkout" class="cus-btn dark">
             <span class="icon-wrapper">
                 <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -442,10 +442,69 @@
         <script>
 // Carrito como array de objetos
 let cart = [];
+
+// Función mejorada para guardar el carrito
 function saveCartToStorage() {
-    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    if (cart.length > 0) {
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    } else {
+        localStorage.removeItem('shoppingCart'); // Eliminar completamente si está vacío
+    }
+    // Disparar evento de actualización
+    const event = new Event('cartUpdated');
+    window.dispatchEvent(event);
 }
 
+// Función mejorada para sincronizar el carrito
+function syncCartFromStorage() {
+    const cartData = localStorage.getItem('shoppingCart');
+    if (cartData) {
+        try {
+            cart = JSON.parse(cartData);
+        } catch (e) {
+            console.error('Error parsing cart:', e);
+            cart = [];
+        }
+    } else {
+        cart = [];
+    }
+    updateCartView();
+}
+
+// Función para limpiar completamente el carrito
+function clearCart() {
+    cart = [];
+    localStorage.removeItem('shoppingCart');
+    updateCartView();
+    // Disparar evento de limpieza
+    const event = new Event('cartCleared');
+    window.dispatchEvent(event);
+}
+
+// Inicialización mejorada
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si debemos limpiar el carrito (viene de checkout)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('clearCart')) {
+        clearCart();
+        // Limpiar el parámetro de la URL sin recargar
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Cargar carrito inicial
+    syncCartFromStorage();
+    
+    // Escuchar eventos personalizados
+    window.addEventListener('cartUpdated', syncCartFromStorage);
+    window.addEventListener('cartCleared', syncCartFromStorage);
+    
+    // Escuchar eventos de storage entre pestañas
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            syncCartFromStorage();
+        }
+    });
+});
 // Función para añadir producto al carrito
 function addToCart(button) {
     const productCard = button.closest('.product-list-card');
@@ -539,18 +598,12 @@ function updateCartView() {
     
     // Actualizar subtotal
     subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-    saveCartToStorage();
 }
 
 // Función para actualizar la cantidad de un producto en el carrito
 function updateCartQuantity(index, change) {
     const newQuantity = cart[index].quantity + change;
-    
-    // Validar que la cantidad no sea menor que 1
-    if (newQuantity < 1) {
-        return;
-    }
-    
+    if (newQuantity < 1) return;
     cart[index].quantity = newQuantity;
     updateCartView();
     saveCartToStorage();
@@ -584,17 +637,22 @@ function handleQuantityControls() {
     });
 }
 document.addEventListener('DOMContentLoaded', function() {
-    // Cargar carrito desde localStorage si existe
-    const savedCart = localStorage.getItem('shoppingCart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
-        updateCartView();
-    }
+    // Cargar carrito al iniciar
+    syncCartFromStorage();
     
-    // Guardar carrito en localStorage antes de que la página se cierre
-    window.addEventListener('beforeunload', function() {
-        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    // Escuchar cambios desde otras pestañas
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart' || event.key === 'cart-updated' || event.key === 'cart-cleared') {
+            syncCartFromStorage();
+        }
     });
+    
+    // Limpiar carrito si viene de checkout
+    if (sessionStorage.getItem('cart-cleared') === 'true') {
+        cart = [];
+        saveCartToStorage();
+        sessionStorage.removeItem('cart-cleared');
+    }
 });
 </script>
 

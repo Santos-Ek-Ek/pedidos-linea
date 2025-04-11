@@ -43,11 +43,9 @@ class AuthController extends Controller
             'password' => Hash::make($request->input('password')),
         ]);
 
-        // Autenticar al usuario después del registro
-        auth()->login($user);
 
         // Redireccionar al dashboard o página de inicio
-        return redirect('login')->with('success', 'Registration successful!');
+        return redirect()->route('loginUser')->with('success', 'Registration successful!');
     }
         // Mostrar formulario de login
         public function showLoginForm()

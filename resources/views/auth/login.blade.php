@@ -272,7 +272,7 @@
                                     <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-10 offset-xxl-4 offset-lg-3 offset-md-2 offset-sm-1">
                                         <h5 class="mb-16">Bienvenido!</h5>
                                         <!-- <p class="mb-32">Kindly input your details blow to stay connected. </p> -->
-                                        <form method="POST" action="{{ route('login.submit') }}">
+                                        <form method="POST" action="{{ route('login.submitUser') }}">
     @csrf
     
     <div class="form-group mb-32">

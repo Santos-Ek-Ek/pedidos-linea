@@ -461,8 +461,6 @@
         <script src="assets/js/vendor/slick.min.js"></script>
         <script src="assets/js/app.js"></script>
         <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Obtener el carrito de localStorage
     const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     const cartTableBody = document.getElementById('cart-table-body');
     const mobileCartItems = document.getElementById('mobile-cart-items');
@@ -470,9 +468,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalElement = document.getElementById('cart-total');
     
     let subtotal = 0;
+    // Funciones globales mejoradas
+function getCart() {
+    const cartData = localStorage.getItem('shoppingCart');
+    return cartData ? JSON.parse(cartData) : [];
+}
+
+function saveCart(cartData) {
+    if (cartData.length > 0) {
+        localStorage.setItem('shoppingCart', JSON.stringify(cartData));
+    } else {
+        localStorage.removeItem('shoppingCart');
+    }
+    // Disparar evento de actualización
+    const event = new Event('cartUpdated');
+    window.dispatchEvent(event);
+}
+
+function clearCart() {
+    localStorage.removeItem('shoppingCart');
+    // Disparar evento de limpieza
+    const event = new Event('cartCleared');
+    window.dispatchEvent(event);
+}
+
+// Función para renderizar el carrito
+function renderCartItems() {
+    const cart = getCart();
+    // (Mantener tu lógica de renderizado actual)
     
-    // Función para actualizar los totales
-    function updateTotals() {
+    if (cart.length === 0) {
+        // Mostrar carrito vacío
+    }
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    renderCartItems();
+    
+    // Escuchar eventos personalizados
+    window.addEventListener('cartUpdated', renderCartItems);
+    window.addEventListener('cartCleared', renderCartItems);
+    
+    // Escuchar eventos de storage entre pestañas
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            renderCartItems();
+        }
+    });
+});
+function updateTotals() {
         const deliveryCost = 5.00; // Costo fijo de envío
         
         // Calcular subtotal
@@ -486,11 +531,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const total = subtotal + deliveryCost;
         totalElement.textContent = `$${total.toFixed(2)}`;
     }
+// Función para actualizar la cantidad (disponible globalmente)
+function updateQuantity(index, change) {
+    const cart = getCart();
+    const newQuantity = cart[index].quantity + change;
+    if (newQuantity < 1) return;
     
+    cart[index].quantity = newQuantity;
+    saveCart(cart);
+    renderCartItems();
+}
+
+// Función para eliminar producto del carrito (disponible globalmente)
+function removeFromCartPage(index) {
+    const cart = getCart();
+    cart.splice(index, 1);
+    saveCart(cart);
+    renderCartItems();
+}
+
+
 // Función para renderizar los productos en la tabla (versión desktop)
 function renderCartItems() {
-    cartTableBody.innerHTML = '';
-    mobileCartItems.innerHTML = '';
+    const cart = getCart();
+    const cartTableBody = document.getElementById('cart-table-body');
+    const mobileCartItems = document.getElementById('mobile-cart-items');
+    const subtotalElement = document.getElementById('cart-subtotal');
+    const totalElement = document.getElementById('cart-total');
     
     if (cart.length === 0) {
         cartTableBody.innerHTML = `
@@ -586,37 +653,6 @@ function renderCartItems() {
     });
     
     updateTotals();
-}
-    
-    // Renderizar los productos al cargar la página
-    renderCartItems();
-});
-
-// Función para actualizar la cantidad (disponible globalmente)
-function updateQuantity(index, change) {
-    const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-    const newQuantity = cart[index].quantity + change;
-    
-    // Validar que la cantidad no sea menor que 1
-    if (newQuantity < 1) return;
-    
-    cart[index].quantity = newQuantity;
-    
-    // Actualizar los inputs de cantidad
-    document.getElementById(`qty-${index}`).value = newQuantity;
-    document.getElementById(`mobile-qty-${index}`).value = newQuantity;
-    
-    // Guardar y actualizar vista
-    localStorage.setItem('shoppingCart', JSON.stringify(cart));
-    document.dispatchEvent(new Event('DOMContentLoaded'));
-}
-
-// Función para eliminar producto del carrito (disponible globalmente)
-function removeFromCartPage(index) {
-    const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-    cart.splice(index, 1);
-    localStorage.setItem('shoppingCart', JSON.stringify(cart));
-    document.dispatchEvent(new Event('DOMContentLoaded'));
 }
 </script>
 

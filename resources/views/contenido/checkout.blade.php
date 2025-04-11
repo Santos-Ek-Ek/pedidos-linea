@@ -241,7 +241,7 @@
                     <!-- Cart Star -->
                     <section class="pt-80 pb-40">
                         <div class="container-fluid">
-                        <form action="{{ route('pedidos.store') }}"method="POST">
+                        <form id="formPedido" action="{{ route('pedidos.store') }}"method="POST">
                         @csrf
                         <input type="hidden" name="productos" id="productos-carrito">
 
@@ -277,14 +277,14 @@
                                                 <div class="form-group mb-32">
                                                     <label>Teléfono</label>
                                                     <input type="tel" name="telefono" autocomplete="off"
-                                                        placeholder="123456790" style="color:black">
+                                                        placeholder="123456790" value="{{ auth()->user()->telefono ?? '' }}" style="color:black">
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="form-group mb-32">
                                                     <label>Dirección</label>
                                                     <input type="text" name="direccion" autocomplete="off"
-                                                        placeholder="Tu dirección" style="color:black">
+                                                        placeholder="Tu dirección" style="color:black" value="{{ auth()->user()->direccion ?? '' }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -294,7 +294,7 @@
                                                 <label>Refencias (optional)</label>
                                                 <textarea name="referencias" id="referencias" rows="5"
                                                     placeholder="Referencias acerca del lugar de entrega. Notas especiales para el repartidor."
-                                                    style="color:black"></textarea>
+                                                    style="color:black">{{ auth()->user()->referencia_envio ?? '' }}</textarea>
                                             </div>
                                         </div>
                                         <div class="payment-method mb-24">
@@ -618,50 +618,45 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos del DOM
-    const form = document.querySelector('form');
+    const form = document.getElementById('formPedido');
     const productosInput = document.getElementById('productos-carrito');
     const orderSummary = document.getElementById('order-summary');
     const orderTotalElement = document.getElementById('order-total');
     
-    // Obtener carrito o array vacío si no existe
-    let cart = [];
-    try {
-        const cartData = localStorage.getItem('shoppingCart');
-        cart = cartData ? JSON.parse(cartData) : [];
-    } catch (e) {
-        console.error('Error al leer el carrito:', e);
-        cart = [];
-    }
-    
-    console.log('Carrito:', cart); // Depuración
-    
-    // Mostrar resumen del pedido
+    // Obtener y mostrar carrito
+    const cart = getCart();
     renderOrderSummary(cart);
-    
-    // Asignar productos al campo oculto
     updateProductosInput();
-    
-    // Actualizar al enviar el formulario
+    console.log('enviando');
+    // Manejar envío del formulario
     form.addEventListener('submit', function(e) {
-        updateProductosInput();
-        console.log('Enviando:', productosInput.value); // Depuración
+        console.log('limpiando');
+
         
-        // Opcional: Validar que hay productos
-        if (cart.length === 0) {
-            e.preventDefault();
-            alert('El carrito está vacío');
-            return false;
-        }
+        setTimeout(() => {
+            clearCart();
+            // Redirigir a productosVenta con confirmación
+         
+        }, 200);
     });
     
+    // Funciones auxiliares
+    function getCart() {
+        console.log('obteniendo');
+        const cartData = localStorage.getItem('shoppingCart');
+        return cartData ? JSON.parse(cartData) : [];
+    }
+    
+    function clearCart() {
+        console.log('liimpiando');
+        localStorage.removeItem('shoppingCart');
+        // Disparar evento de limpieza
+        const event = new Event('cartCleared');
+        window.dispatchEvent(event);
+    }
+    
     function updateProductosInput() {
-        try {
-            productosInput.value = JSON.stringify(cart);
-        } catch (e) {
-            console.error('Error al convertir carrito a JSON:', e);
-            productosInput.value = '[]';
-        }
+        productosInput.value = JSON.stringify(getCart());
     }
     
     function renderOrderSummary(cart) {
@@ -694,6 +689,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const total = subtotal + deliveryCost;
         orderTotalElement.textContent = `$${total.toFixed(2)}`;
     }
+    
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart' || event.key === 'cart-cleared') {
+            const updatedCart = getCart();
+            renderOrderSummary(updatedCart);
+            updateProductosInput();
+        }
+    });
 });
 </script>
 

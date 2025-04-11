@@ -21,8 +21,8 @@ use App\Http\Controllers\ventaProductoController;
 // Rutas de autenticación
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('loginUser');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submitUser');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', function () {
@@ -39,7 +39,7 @@ Route::get('/checkout', function () {
 
 Route::post('/guardar-pedido', [PedidoController::class, 'store'])
      ->name('pedidos.store')
-     ->middleware(['auth']); // Asegúrate de que el usuario esté autenticado
+     ->middleware('auth');
 
 Route::get('/productosVenta', [ventaProductoController::class, 'index'])->name('productosVenta');
 
