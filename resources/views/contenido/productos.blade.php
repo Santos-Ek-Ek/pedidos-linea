@@ -346,7 +346,7 @@
 </div>
 </div>
                                         <!-- Pagination Start -->
-                                        <ul class="pagination text-center">
+                                        <!-- <ul class="pagination text-center">
                                             <li class="prev"><a href="#"><i class="fa-regular fa-chevron-left"></i></a></li>
                                             <li class="active"><a href="#">1</a></li>
                                             <li><a href="#">2</a></li>
@@ -354,7 +354,7 @@
                                             <li><a href="#">...</a></li>
                                             <li><a href="#">10</a></li>
                                             <li class="next"><a href="#"><i class="fa-regular fa-chevron-right"></i></a></li>
-                                        </ul>
+                                        </ul> -->
                                         <!-- Pagination End -->
                                     </div>
                                 </div>
