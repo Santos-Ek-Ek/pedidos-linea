@@ -541,7 +541,7 @@
             
             hours.push({
                 display: timeRange,
-                value: timeRange // Usa el mismo rango completo como valor
+                value: timeRange
             });
         }
         return hours;
@@ -563,6 +563,10 @@
     });
 
     // Obtener elementos del DOM
+    const form = document.getElementById('formPedido');
+    const productosInput = document.getElementById('productos-carrito');
+    const orderSummary = document.getElementById('order-summary');
+    const orderTotalElement = document.getElementById('order-total');
     const deliveryOptions = document.querySelectorAll('.delivery-option');
     const payOnDeliveryOption = document.getElementById('pay-on-delivery-option');
     const payOnPickupOption = document.getElementById('pay-on-pickup-option');
@@ -570,7 +574,84 @@
     const deliveryTimeContainer = document.getElementById('delivery-time-container');
 
     // Obtener la opción seleccionada inicialmente
-    const selectedOption = document.querySelector('.delivery-option:checked').value;
+    let selectedOption = document.querySelector('.delivery-option:checked').value;
+
+    // Funciones auxiliares
+    function getCart() {
+        const cartData = localStorage.getItem('shoppingCart');
+        return cartData ? JSON.parse(cartData) : [];
+    }
+    
+    function clearCart() {
+        localStorage.removeItem('shoppingCart');
+        const event = new Event('cartCleared');
+        window.dispatchEvent(event);
+    }
+    
+    function updateProductosInput() {
+        productosInput.value = JSON.stringify(getCart());
+    }
+
+    // Función para calcular y mostrar el total con/sin costo de envío
+    function calculateTotal(subtotal, deliveryOption) {
+        const deliveryCost = 5.00;
+        let total = subtotal;
+        let deliveryFeeElement = document.getElementById('delivery-fee');
+        
+        if (deliveryOption === 'Enviar a domicilio') {
+            total += deliveryCost;
+            if (!deliveryFeeElement) {
+                const summaryContainer = document.getElementById('order-summary');
+                deliveryFeeElement = document.createElement('div');
+                deliveryFeeElement.id = 'delivery-fee';
+                deliveryFeeElement.className = 'd-flex justify-content-between align-items-center mb-16';
+                deliveryFeeElement.innerHTML = `
+                    <div>
+                        <p class="lead color-black mb-0">Costo de envío</p>
+                    </div>
+                    <p class="lead">$${deliveryCost.toFixed(2)}</p>
+                `;
+                summaryContainer.appendChild(deliveryFeeElement);
+            } else {
+                deliveryFeeElement.querySelector('p.lead').textContent = `$${deliveryCost.toFixed(2)}`;
+                deliveryFeeElement.style.display = 'flex';
+            }
+        } else if (deliveryFeeElement) {
+            deliveryFeeElement.style.display = 'none';
+        }
+        
+        return total;
+    }
+
+    function renderOrderSummary(cart, deliveryOption) {
+        let subtotal = 0;
+        orderSummary.innerHTML = '';
+
+        if (cart.length === 0) {
+            orderSummary.innerHTML = '<p class="text-center">No hay productos en el carrito</p>';
+            orderTotalElement.textContent = '$0.00';
+            return;
+        }
+
+        cart.forEach(product => {
+            const productTotal = product.price * product.quantity;
+            subtotal += productTotal;
+
+            const productRow = document.createElement('div');
+            productRow.className = 'd-flex justify-content-between align-items-center mb-16';
+            productRow.innerHTML = `
+                <div>
+                    <p class="lead color-black mb-0">${product.name} x${product.quantity}</p>
+                    ${product.nota ? `<small class="text-muted">Nota: ${product.nota}</small>` : ''}
+                </div>
+                <p class="lead">$${productTotal.toFixed(2)}</p>
+            `;
+            orderSummary.appendChild(productRow);
+        });
+
+        const total = calculateTotal(subtotal, deliveryOption);
+        orderTotalElement.textContent = `$${total.toFixed(2)}`;
+    }
 
     // Configurar el estado inicial
     if (selectedOption === 'Pasar a recoger') {
@@ -587,9 +668,18 @@
         document.getElementById('cod').checked = true;
     }
 
+    // Mostrar carrito inicial
+    const cart = getCart();
+    renderOrderSummary(cart, selectedOption);
+    updateProductosInput();
+
     // Manejar cambios en las opciones de entrega
     deliveryOptions.forEach(option => {
         option.addEventListener('change', function() {
+            selectedOption = this.value;
+            const cart = getCart();
+            renderOrderSummary(cart, selectedOption);
+            
             if (this.value === 'Pasar a recoger') {
                 pickupTimeContainer.style.display = 'block';
                 deliveryTimeContainer.style.display = 'none';
@@ -605,10 +695,46 @@
             }
         });
     });
+
+    // Manejar envío del formulario
+    form.addEventListener('submit', function(e) {
+        setTimeout(() => {
+            clearCart();
+        }, 200);
+    });
+    
+    // Actualizar cuando cambia el carrito
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart' || event.key === 'cart-cleared') {
+            const updatedCart = getCart();
+            renderOrderSummary(updatedCart, selectedOption);
+            updateProductosInput();
+        }
+    });
 });
-    </script>
+</script>
 
     <style>
+    /* Estilos adicionales para mejorar la presentación */
+    #order-summary small.text-muted {
+        display: block;
+        font-size: 12px;
+        margin-top: 4px;
+        font-style: italic;
+        color: #666;
+    }
+
+    .cart-summary-detail {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 16px;
+    }
+
+    .mb-16 {
+        margin-bottom: 16px;
+    }
+    </style>
+
+<style>
     /* Estilos opcionales para mejorar la apariencia */
     .delivery-option {
         margin-right: 10px;
@@ -638,112 +764,6 @@
         margin-left: 16px;
     }
     </style>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('formPedido');
-    const productosInput = document.getElementById('productos-carrito');
-    const orderSummary = document.getElementById('order-summary');
-    const orderTotalElement = document.getElementById('order-total');
-    
-    // Obtener y mostrar carrito
-    const cart = getCart();
-    renderOrderSummary(cart);
-    updateProductosInput();
-    console.log('enviando');
-    // Manejar envío del formulario
-    form.addEventListener('submit', function(e) {
-        console.log('limpiando');
-
-        
-        setTimeout(() => {
-            clearCart();
-            // Redirigir a productosVenta con confirmación
-         
-        }, 200);
-    });
-    
-    // Funciones auxiliares
-    function getCart() {
-        console.log('obteniendo');
-        const cartData = localStorage.getItem('shoppingCart');
-        return cartData ? JSON.parse(cartData) : [];
-    }
-    
-    function clearCart() {
-        console.log('liimpiando');
-        localStorage.removeItem('shoppingCart');
-        // Disparar evento de limpieza
-        const event = new Event('cartCleared');
-        window.dispatchEvent(event);
-    }
-    
-    function updateProductosInput() {
-        productosInput.value = JSON.stringify(getCart());
-    }
-    
-    function renderOrderSummary(cart) {
-        let subtotal = 0;
-        const deliveryCost = 5.00;
-        orderSummary.innerHTML = '';
-
-        if (cart.length === 0) {
-            orderSummary.innerHTML = '<p class="text-center">No hay productos en el carrito</p>';
-            orderTotalElement.textContent = '$0.00';
-            return;
-        }
-
-        cart.forEach(product => {
-            const productTotal = product.price * product.quantity;
-            subtotal += productTotal;
-
-            const productRow = document.createElement('div');
-            productRow.className = 'd-flex justify-content-between align-items-center mb-16';
-            productRow.innerHTML = `
-                <div>
-                    <p class="lead color-black mb-0">${product.name} x${product.quantity}</p>
-                    ${product.nota ? `<small class="text-muted">Nota: ${product.nota}</small>` : ''}
-                </div>
-                <p class="lead">$${productTotal.toFixed(2)}</p>
-            `;
-            orderSummary.appendChild(productRow);
-        });
-
-        const total = subtotal + deliveryCost;
-        orderTotalElement.textContent = `$${total.toFixed(2)}`;
-    }
-    
-    window.addEventListener('storage', function(event) {
-        if (event.key === 'shoppingCart' || event.key === 'cart-cleared') {
-            const updatedCart = getCart();
-            renderOrderSummary(updatedCart);
-            updateProductosInput();
-        }
-    });
-});
-</script>
-
-    <style>
-    /* Estilos adicionales para mejorar la presentación */
-    #order-summary small.text-muted {
-        display: block;
-        font-size: 12px;
-        margin-top: 4px;
-        font-style: italic;
-        color: #666;
-    }
-
-    .cart-summary-detail {
-        border-bottom: 1px solid #eee;
-        padding-bottom: 16px;
-    }
-
-    .mb-16 {
-        margin-bottom: 16px;
-    }
-    </style>
-
 
 </body>
 
