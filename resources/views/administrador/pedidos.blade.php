@@ -15,7 +15,7 @@
     }
 </style>
 
-<script src="{{ asset('js/pedido.js') }}"></script>
+
 <div class="container-fluid">
 <div class="form-group">
     <label for="searchInput">Buscar por teléfono:</label>
@@ -93,11 +93,11 @@
                     @endforeach
                 </tbody>
                 <!-- Agrega esta fila al final de tu tabla -->
-<tr id="noPendientesMessage" style="display: none;">
-    <td colspan="9">No hay pedidos pendientes.</td>
+                <tr id="noPendientesMessage" style="display: none;">
+    <td colspan="13" class="text-center">No hay pedidos pendientes.</td>
 </tr>
 <tr id="noEnviadosMessage" style="display: none;">
-    <td colspan="9">Ningún pedido ha sido enviado.</td>
+    <td colspan="13" class="text-center">No hay pedidos enviados.</td>
 </tr>
               </table>
 
@@ -122,5 +122,72 @@ document.getElementById('searchInput').addEventListener('keyup', function() {
         }
     });
 });
+
+
+
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para filtrar por teléfono y estado
+    function filterRows() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+        const checkEnviados = document.getElementById('checkEnviados').checked;
+        const checkPendientes = document.getElementById('checkPendientes').checked;
+        const rows = document.querySelectorAll('tbody tr');
+        
+        let hasEnviados = false;
+        let hasPendientes = false;
+
+        rows.forEach(row => {
+            // Extraer teléfono (celda 6 - USUARIO)
+            const clientInfo = row.cells[6].textContent.toLowerCase();
+            const phone = clientInfo.split('tel:')[1]?.trim().split(' ')[0] || '';
+            
+            // Extraer estado (celda 11 - ESTADO)
+            const estadoCell = row.cells[11];
+            if(!estadoCell) {
+                console.error('No se encontró la celda de estado');
+                return;
+            }
+            
+            // Limpiar el texto del estado (puede incluir otros elementos como el enlace PDF)
+            const estadoText = estadoCell.textContent.trim();
+            const estado = estadoText.includes('Enviado') ? 'Enviado' : 
+                          estadoText.includes('Pendiente') ? 'Pendiente' : '';
+            
+            // Verificar coincidencia con búsqueda y filtros
+            const matchesPhone = phone.includes(searchValue) || searchValue === '';
+            const matchesEnviados = checkEnviados && estado === 'Enviado';
+            const matchesPendientes = checkPendientes && estado === 'Pendiente';
+            
+            // Mostrar u ocultar fila según condiciones
+            if (matchesPhone && 
+                ((checkEnviados && matchesEnviados) || 
+                 (checkPendientes && matchesPendientes) ||
+                 (!checkEnviados && !checkPendientes))) {
+                row.style.display = '';
+                if (estado === 'Enviado') hasEnviados = true;
+                if (estado === 'Pendiente') hasPendientes = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensajes cuando no hay resultados
+        document.getElementById('noEnviadosMessage').style.display = 
+            (checkEnviados && !hasEnviados) ? '' : 'none';
+        document.getElementById('noPendientesMessage').style.display = 
+            (checkPendientes && !hasPendientes) ? '' : 'none';
+    }
+
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('keyup', filterRows);
+    document.getElementById('checkEnviados').addEventListener('change', filterRows);
+    document.getElementById('checkPendientes').addEventListener('change', filterRows);
+
+    // Filtrar al cargar la página
+    filterRows();
+});
+</script>
 @endsection
