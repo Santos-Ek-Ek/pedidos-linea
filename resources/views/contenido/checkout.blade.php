@@ -54,9 +54,10 @@
                                 <div class="ui-header-col">
                                     <!-- header Logo  -->
                                     <div class="ui-logo"> 
-                                        <a href="index-2.html">
-                                            <img src="assets/media/logo-white.png" class="ui-logo-light" alt="Logo"> <!-- logo light -->
-                                            <img src="assets/media/logo.png" class="ui-logo-dark" alt="Logo"> <!-- logo dark -->
+                                        <a href="">
+                                        <img src="img/laterraza.png" class="ui-logo-light" alt="Logo"> <!-- logo light -->
+                                        <img src="img/laterraza.png" class="ui-logo-dark" alt="Logo"> <!-- logo dark -->
+
                                         </a>
                                     </div>
                                 </div>
@@ -91,12 +92,12 @@
                                                                 <ul class="ui-ol-menu-list">
 
                                                                     <li class="ui-ol-submenu-wrap">
-                                                                        <div class="ui-ol-submenu-trigger">
+                                                                        <!-- <div class="ui-ol-submenu-trigger">
                                                                             <a href="#">Inicio</a>
                                                                             <div class="ui-ol-submenu-caret-wrap">
                                                                                 <div class="ui-ol-submenu-caret"></div>
                                                                             </div> 
-                                                                        </div>
+                                                                        </div> -->
                                                                         <div class="ui-ol-submenu">
                                                                             <ul class="ui-ol-submenu-list">
                 
@@ -138,7 +139,7 @@
                                                                     </li>
                                                                     <!-- End submenu (sub-master) -->
                 
-                                                                    <li><a href="contact-us.html">Contactanos</a></li>
+                                                                    <!-- <li><a href="contact-us.html">Contactanos</a></li> -->
                 
                                                                 </ul>
                                                                 <!-- End menu list -->
@@ -156,12 +157,12 @@
                                                                         <a class="lead dark-gray mb-16" href="mailto:info@example.com">gilmereb37@gmail.com</a>
                                                                         <p class="lead dark-gray">Calle 21a X20 Y 22 Centro Cacalchén, Yucatán, México</p>
                                                                     </div>
-                                                                    <ul class="social-icons-list unstyled">
+                                                                    <!-- <ul class="social-icons-list unstyled">
                                                                         <li><a href="#"><img src="assets/media/icons/Facebook.svg" alt=""></a></li>
                                                                         <li><a href="#"><img src="assets/media/icons/Twitter.svg" alt=""></a></li>
                                                                         <li><a href="#"><img src="assets/media/icons/Instagram.svg" alt=""></a></li>
                                                                         <li><a href="#"><img src="assets/media/icons/Linkedin.svg" alt=""></a></li>
-                                                                    </ul>
+                                                                    </ul> -->
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -181,7 +182,7 @@
             <i class="fa-regular fa-user"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="">Mi Cuenta</a></li>
+            <!-- <li><a class="dropdown-item" href="">Mi Cuenta</a></li> -->
             <li><hr class="dropdown-divider"></li>
             <li>
                 <form method="POST" action="{{ route('logoutUser') }}">
