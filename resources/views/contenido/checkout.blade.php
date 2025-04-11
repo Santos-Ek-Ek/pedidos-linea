@@ -301,7 +301,7 @@
                                             <ul class="unstyled">
                                                 <li>
                                                     <label class="lead" for="cod">
-                                                        <input id="cod" type="radio" name="delivery_option"
+                                                        <input  type="radio" name="delivery_option"
                                                             class="radio delivery-option" value="Pasar a recoger"
                                                             checked="checked">
                                                         Pasar a recoger
@@ -317,7 +317,7 @@
                                                 </li>
                                                 <li class="mt-3">
                                                     <label class="lead" for="cp">
-                                                        <input id="cp" type="radio" name="delivery_option"
+                                                        <input type="radio" name="delivery_option"
                                                             class="radio delivery-option" value="Enviar a domicilio">
                                                         Enviar a domicilio
                                                     </label>
@@ -346,13 +346,15 @@
                                             </div>
                                             <div class="payment-method mb-24">
                                                 <ul class="unstyled">
-                                                    <li>
-                                                        <label class="lead" for="cod"><input id="cod" type="radio"
+                                                    <li id="pay-on-delivery-option" style="display: none;">
+                                                        <label class="lead" for="cod">
+                                                            <input id="cod" type="radio"
                                                                 name="metodo_pago" class="radio" value="Pagar al repartidor"
                                                                 checked="checked">Pagar al repartidor</label>
                                                     </li>
-                                                    <li>
-                                                        <label class="lead" for="cp"><input id="cp" type="radio"
+                                                    <li id="pay-on-pickup-option">
+                                                        <label class="lead" for="cp">
+                                                            <input id="cp" type="radio"
                                                                 name="metodo_pago" class="radio" value="Pagar al pasar a
                                                             recoge">Pagar al pasar a
                                                             recoger</label>
@@ -526,62 +528,84 @@
     <script src="assets/js/app.js"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Generar horarios de 9am a 11pm en intervalos de 1 hora
-        function generateTimeSlots() {
-    const hours = [];
-    for (let i = 9; i <= 22; i++) {
-        const hour = i > 12 ? i - 12 : i;
-        const ampm = i >= 12 ? 'pm' : 'am';
-        const nextHour = (i + 1) > 12 ? (i + 1) - 12 : (i + 1);
-        const nextAmpm = (i + 1) >= 12 ? 'pm' : 'am';
-        const timeRange = `${hour}:00${ampm} - ${nextHour}:00${nextAmpm}`;
-        
-        hours.push({
-            display: timeRange,
-            value: timeRange // Usa el mismo rango completo como valor
-        });
-    }
-    return hours;
-}
-
-        const timeSlots = generateTimeSlots();
-        const pickupSelect = document.getElementById('pickup-time');
-        const deliverySelect = document.getElementById('delivery-time');
-
-        // Llenar los select con las opciones de horario
-        timeSlots.forEach(slot => {
-            const pickupOption = document.createElement('option');
-            pickupOption.value = slot.value;
-            pickupOption.textContent = slot.display;
-            pickupSelect.appendChild(pickupOption.cloneNode(true));
-
-            const deliveryOption = pickupOption.cloneNode(true);
-            deliverySelect.appendChild(deliveryOption);
-        });
-
-        // Mostrar/ocultar selectores según la opción elegida
-        const deliveryOptions = document.querySelectorAll('.delivery-option');
-        deliveryOptions.forEach(option => {
-            option.addEventListener('change', function() {
-                if (this.value === 'Pasar a recoger') {
-                    document.getElementById('pickup-time-container').style.display = 'block';
-                    document.getElementById('delivery-time-container').style.display = 'none';
-                } else if (this.value === 'Enviar a domicilio') {
-                    document.getElementById('delivery-time-container').style.display = 'block';
-                    document.getElementById('pickup-time-container').style.display = 'none';
-                }
+ document.addEventListener('DOMContentLoaded', function() {
+    // Generar horarios de 9am a 11pm en intervalos de 1 hora
+    function generateTimeSlots() {
+        const hours = [];
+        for (let i = 9; i <= 22; i++) {
+            const hour = i > 12 ? i - 12 : i;
+            const ampm = i >= 12 ? 'pm' : 'am';
+            const nextHour = (i + 1) > 12 ? (i + 1) - 12 : (i + 1);
+            const nextAmpm = (i + 1) >= 12 ? 'pm' : 'am';
+            const timeRange = `${hour}:00${ampm} - ${nextHour}:00${nextAmpm}`;
+            
+            hours.push({
+                display: timeRange,
+                value: timeRange // Usa el mismo rango completo como valor
             });
-        });
-
-        // Mostrar el selector correspondiente al cargar la página
-        const selectedOption = document.querySelector('.delivery-option:checked').value;
-        if (selectedOption === 'Pasar a recoger') {
-            document.getElementById('pickup-time-container').style.display = 'block';
-        } else {
-            document.getElementById('delivery-time-container').style.display = 'block';
         }
+        return hours;
+    }
+
+    const timeSlots = generateTimeSlots();
+    const pickupSelect = document.getElementById('pickup-time');
+    const deliverySelect = document.getElementById('delivery-time');
+
+    // Llenar los select con las opciones de horario
+    timeSlots.forEach(slot => {
+        const pickupOption = document.createElement('option');
+        pickupOption.value = slot.value;
+        pickupOption.textContent = slot.display;
+        pickupSelect.appendChild(pickupOption.cloneNode(true));
+
+        const deliveryOption = pickupOption.cloneNode(true);
+        deliverySelect.appendChild(deliveryOption);
     });
+
+    // Obtener elementos del DOM
+    const deliveryOptions = document.querySelectorAll('.delivery-option');
+    const payOnDeliveryOption = document.getElementById('pay-on-delivery-option');
+    const payOnPickupOption = document.getElementById('pay-on-pickup-option');
+    const pickupTimeContainer = document.getElementById('pickup-time-container');
+    const deliveryTimeContainer = document.getElementById('delivery-time-container');
+
+    // Obtener la opción seleccionada inicialmente
+    const selectedOption = document.querySelector('.delivery-option:checked').value;
+
+    // Configurar el estado inicial
+    if (selectedOption === 'Pasar a recoger') {
+        pickupTimeContainer.style.display = 'block';
+        deliveryTimeContainer.style.display = 'none';
+        payOnDeliveryOption.style.display = 'none';
+        payOnPickupOption.style.display = 'block';
+        document.getElementById('cp').checked = true;
+    } else {
+        deliveryTimeContainer.style.display = 'block';
+        pickupTimeContainer.style.display = 'none';
+        payOnDeliveryOption.style.display = 'block';
+        payOnPickupOption.style.display = 'none';
+        document.getElementById('cod').checked = true;
+    }
+
+    // Manejar cambios en las opciones de entrega
+    deliveryOptions.forEach(option => {
+        option.addEventListener('change', function() {
+            if (this.value === 'Pasar a recoger') {
+                pickupTimeContainer.style.display = 'block';
+                deliveryTimeContainer.style.display = 'none';
+                payOnDeliveryOption.style.display = 'none';
+                payOnPickupOption.style.display = 'block';
+                document.getElementById('cp').checked = true;
+            } else if (this.value === 'Enviar a domicilio') {
+                deliveryTimeContainer.style.display = 'block';
+                pickupTimeContainer.style.display = 'none';
+                payOnDeliveryOption.style.display = 'block';
+                payOnPickupOption.style.display = 'none';
+                document.getElementById('cod').checked = true;
+            }
+        });
+    });
+});
     </script>
 
     <style>
