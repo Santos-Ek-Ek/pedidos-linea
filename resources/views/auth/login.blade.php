@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="RoyalFare - Restaurant html template">
 
-        <title>Royal Fare</title>
+        <title>La Terraza</title>
 
         <!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" href="assets/media/favicon.png">
@@ -39,7 +39,6 @@
                 <span data-text="Z">Z</span>
                 <span data-text="A">A</span>
             </div>
-            <!-- <img src="assets/media/icons/logo-vector.png" alt="" class="logo-bottom-vector"> -->
         </div>
 
         <!--  Begin scroll container -->
@@ -56,8 +55,9 @@
                                     <!-- header Logo  -->
                                     <div class="ui-logo"> 
                                         <a href="">
-                                            <img src="img/laterraza.png" class="ui-logo-light"  alt="Logo"> <!-- logo light -->
-                                            <img src="img/laterraza.png" class="ui-logo-dark" alt="Logo"> <!-- logo dark -->
+                                        <img src="img/laterraza.png" class="ui-logo-light" alt="Logo"> <!-- logo light -->
+                                        <img src="img/laterraza.png" class="ui-logo-dark" alt="Logo"> <!-- logo dark -->
+
                                         </a>
                                     </div>
                                 </div>
@@ -66,8 +66,8 @@
                                     <!-- Begin overlay menu toggle button -->
                                     <div id="ui-ol-menu-toggle-btn-wrap">
                                         <div class="ui-ol-menu-toggle-btn-text">
-                                            <span class="text-menu" data-hover="Open">Menu</span>
-                                            <span class="text-close">Close</span>
+                                            <span class="text-menu" data-hover="Abrir">Menu</span>
+                                            <span class="text-close">Cerrar</span>
                                         </div>
                                         <div class="ui-ol-menu-toggle-btn-holder">
                                             <a href="#" class="ui-ol-menu-toggle-btn"><span></span></a>
@@ -92,26 +92,32 @@
                                                                 <ul class="ui-ol-menu-list">
 
                                                                     <li class="ui-ol-submenu-wrap">
-                                                                        <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Home</a>
+                                                                        <!-- <div class="ui-ol-submenu-trigger">
+                                                                            <a href="#">Inicio</a>
                                                                             <div class="ui-ol-submenu-caret-wrap">
                                                                                 <div class="ui-ol-submenu-caret"></div>
                                                                             </div> 
-                                                                        </div> 
+                                                                        </div> -->
                                                                         <div class="ui-ol-submenu">
                                                                             <ul class="ui-ol-submenu-list">
-                                                                                <li><a href="index-2.html">Home 1</a></li>
-                                                                                <li><a href="index-3.html">Home 2</a></li>
+                
+                                                                                <!-- Begin submenu -->
+                                                                                <li class="ui-ol-submenu-wrap">
+
+                                                                                        <a href="inicio" class="ui-ol-submenu-link">Principal</a>
+
+
+                                                                                </li>
+
+                                                                                
                                                                             </ul>
                                                                         </div> 
                                                                     </li>
 
-                                                                    <li><a href="about.html">About Us</a></li>
-
                                                                     <!-- Begin submenu (submenu master) -->
                                                                     <li class="ui-ol-submenu-wrap">
                                                                         <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Shop</a>
+                                                                            <a href="#">Ventas</a>
                                                                             <div class="ui-ol-submenu-caret-wrap">
                                                                                 <div class="ui-ol-submenu-caret"></div>
                                                                             </div>
@@ -122,77 +128,18 @@
                                                                                 <!-- Begin submenu -->
                                                                                 <li class="ui-ol-submenu-wrap">
 
-                                                                                        <a href="productosVenta" class="ui-ol-submenu-link">Products</a>
+                                                                                        <a href="productosVenta" class="ui-ol-submenu-link">Productos</a>
 
 
                                                                                 </li>
-                                                                                <li><a href="product-detail.html">Product Detail</a></li>
-                                                                                <!-- Begin submenu -->
-                                                                                <li class="ui-ol-submenu-wrap">
-                                                                                    <div class="ui-ol-submenu-trigger">
-                                                                                        <a href="#" class="ui-ol-submenu-link">Product Ordering</a>
-                                                                                        <div class="ui-ol-submenu-caret-wrap">
-                                                                                            <div class="ui-ol-submenu-caret"></div>
-                                                                                        </div> 
-                                                                                    </div> 
-                                                                                    <div class="ui-ol-submenu">
-                                                                                        <ul class="ui-ol-submenu-list">
-                                                                                            <li><a href="cart.html">Cart</a></li>
-                                                                                            <li><a href="checkout.html">Checkout</a></li>
-                                                                                            <li><a href="wishlist.html">Wishlist</a></li>
-                                                                                            <li><a href="order-tracking.html">Order Tracking</a></li>
-                                                                                        </ul>
-                                                                                    </div>
-                                                                                </li>
-                                                                                <!-- End submenu -->
+
                                                                                 
                                                                             </ul>
                                                                         </div> 
                                                                     </li>
                                                                     <!-- End submenu (sub-master) -->
-
-                                                                    <!-- Begin submenu (submenu master) -->
-                                                                    <li class="ui-ol-submenu-wrap">
-                                                                        <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Blogs</a>
-                                                                            <div class="ui-ol-submenu-caret-wrap">
-                                                                                <div class="ui-ol-submenu-caret"></div>
-                                                                            </div> 
-                                                                        </div>
-                                                                        <div class="ui-ol-submenu">
-                                                                            <ul class="ui-ol-submenu-list">
-                                                                                <li><a href="blog-grid.html">Blog Grid</a></li>
-                                                                                <li><a href="blog-grid-left-sidebar.html">Blog Grid (Sidebar Left)</a></li>
-                                                                                <li><a href="blog-grid-right-sidebar.html">Blog Grid (Sidebar Right)</a></li>
-                                                                                <li><a href="blog-list.html">Blog List</a></li>
-                                                                                <li><a href="blog-detail.html">Blog Detail</a></li>
-                                                                            </ul>
-                                                                        </div> 
-                                                                    </li>
-                                                                    <!-- End submenu (sub-master) -->
-
-                                                                    <!-- Begin submenu (submenu master) -->
-                                                                    <li class="ui-ol-submenu-wrap active">
-                                                                        <div class="ui-ol-submenu-trigger">
-                                                                            <a href="#">Pages</a>
-                                                                            <div class="ui-ol-submenu-caret-wrap">
-                                                                                <div class="ui-ol-submenu-caret"></div>
-                                                                            </div> 
-                                                                        </div>
-                                                                        <div class="ui-ol-submenu">
-                                                                            <ul class="ui-ol-submenu-list">
-                                                                                <li><a href="menu.html">Menu</a></li>
-                                                                                <li><a href="team.html">Team</a></li>
-                                                                                <li class="active"><a href="login.html">Login</a></li>
-                                                                                <li><a href="register">Signup</a></li>
-                                                                                <li><a href="404.html">404 Page</a></li>
-                                                                                <li><a href="coming-soon.html">Coming Soon</a></li>
-                                                                            </ul>
-                                                                        </div> 
-                                                                    </li>
-                                                                    <!-- End submenu (sub-master) -->
                 
-                                                                    <li><a href="contact-us.html">Contact</a></li>
+                                                                    <!-- <li><a href="contact-us.html">Contactanos</a></li> -->
                 
                                                                 </ul>
                                                                 <!-- End menu list -->
@@ -201,21 +148,21 @@
                                                                 <div class="company-info">
                                                                     <img src="assets/media/vector/menu-vector.png" alt="" class="vector">
                                                                     <div class="mb-32">
-                                                                        <h6 class="color-primary mb-8">Opening Hours</h6>
-                                                                        <p class="lead dark-gray">Every Day 09:00am to 10PM:00pm</p>
+                                                                        <h6 class="color-primary mb-8">Horario</h6>
+                                                                        <p class="lead dark-gray">Todos los dias de 09:00am a 11:00pm</p>
                                                                     </div>
                                                                     <div class="mb-32">
-                                                                        <h6 class="mb-8">Contact Us</h6>
-                                                                        <p class="lead dark-gray mb-16"><span><a href="tel:123456789">+1 (555) 123-4567</a> ,</span> <span> <a href="tel:123456789">+1 (555) 987-6543</a></span></p>
-                                                                        <a class="lead dark-gray mb-16" href="mailto:info@example.com">email@example.com</a>
-                                                                        <p class="lead dark-gray">456 Trendy Street, Sydney, NSW 2000, USA.</p>
+                                                                        <h6 class="mb-8">Contactanos</h6>
+                                                                        <p class="lead dark-gray mb-16"><span><a href="tel:123456789">+52 999 109 6674</a></span></p>
+                                                                        <a class="lead dark-gray mb-16" href="mailto:info@example.com">gilmereb37@gmail.com</a>
+                                                                        <p class="lead dark-gray">Calle 21a X20 Y 22 Centro Cacalchén, Yucatán, México</p>
                                                                     </div>
-                                                                    <ul class="social-icons-list unstyled">
+                                                                    <!-- <ul class="social-icons-list unstyled">
                                                                         <li><a href="#"><img src="assets/media/icons/Facebook.svg" alt=""></a></li>
                                                                         <li><a href="#"><img src="assets/media/icons/Twitter.svg" alt=""></a></li>
                                                                         <li><a href="#"><img src="assets/media/icons/Instagram.svg" alt=""></a></li>
                                                                         <li><a href="#"><img src="assets/media/icons/Linkedin.svg" alt=""></a></li>
-                                                                    </ul>
+                                                                    </ul> -->
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -235,10 +182,10 @@
             <i class="fa-regular fa-user"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="">Mi Cuenta</a></li>
+            <!-- <li><a class="dropdown-item" href="">Mi Cuenta</a></li> -->
             <li><hr class="dropdown-divider"></li>
             <li>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logoutUser') }}">
                     @csrf
                     <button type="submit" class="dropdown-item">Cerrar Sesión</button>
                 </form>
@@ -327,48 +274,7 @@
                     <!-- Newsletter Section end  -->
         
                     <!-- Footer Area Start -->
-                    <footer>
-                        <div class="footer-main">
-                            <!-- <img src="assets/media/bg/footer-bg.png" alt="" class="footer-bg-vetor"> -->
-                            <div class="container-fluid">
-                                <div class="row align-items-center">
-                                    <div class="col-xl-3 text-xl-left text-center">
-                                        <a href="index-2.html" class="mb-xl-0 mb-32"> <img src="assets/media/logo-white.png" alt=""></a>
-                                    </div>
-                                    <div class="col-xl-6">
-                                        <ul class="footer-nav unstyled mb-xl-0 mb-32">
-                                            <li><a href="index-2.html">Home</a></li>
-                                            <li><a href="menu.html">Menu</a></li>
-                                            <li><a href="about.html">About</a></li>
-                                            <li><a href="blog-grid.html">Blog</a></li>
-                                            <li><a href="contact-us.html">Contact</a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-xl-3">
-                                        <ul class="social-icons-list unstyled">
-                                            <li><a href="#"><img src="assets/media/icons/Facebook.svg" alt=""></a></li>
-                                            <li><a href="#"><img src="assets/media/icons/Twitter.svg" alt=""></a></li>
-                                            <li><a href="#"><img src="assets/media/icons/Instagram.svg" alt=""></a></li>
-                                            <li><a href="#"><img src="assets/media/icons/Linkedin.svg" alt=""></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="footer-bottom">
-                            <div class="container-fluid">
-                                <div class="bottom-row">
-                                    <div class="copyright-text">
-                                        <p>© 2024. All rights reserved by <a href="index-2.html">Royal Fare</a></p>
-                                    </div>
-                                    <div class="right-block">
-                                        <a href="#">Privacy Policy</a>
-                                        <a href="#">Terms and Condition</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </footer>
+
                     <!-- Footer Area end -->
                 </main>
             </div>
