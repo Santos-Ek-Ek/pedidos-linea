@@ -303,7 +303,7 @@
                                         <div class="container-fluid mt-4">
     <ul class="product-list" id="product-list-container">
         @foreach($productos as $producto)
-        <li class="product-list-card item-card mb-32" data-product-id="{{ $producto->id }}" data-price="{{ $producto->precio }}"  data-category="{{ $producto->categoria->nombre }}" data-available="{{ $producto->disponibles }}">
+        <li class="product-list-card item-card mb-32" data-product-id="{{ $producto->id }}" data-price="{{ $producto->precio }}"  data-category="{{ $producto->categoria->nombre }}" data-available="{{ $producto->disponibles }}" data-original-available="{{ $producto->disponibles }}">
             <div class="row">
                 <div class="col-md-4">
                     <div class="product-img text-center">
@@ -544,6 +544,7 @@ function saveCartToStorage() {
 function syncCartFromStorage() {
     const cartData = localStorage.getItem('shoppingCart');
     cart = cartData ? JSON.parse(cartData) : [];
+    updateAvailableStock(); 
     updateCartView();
 }
 
@@ -560,6 +561,11 @@ function updateAvailableStock() {
     document.querySelectorAll('.product-list-card').forEach(card => {
         const productId = card.dataset.productId;
         const originalAvailable = parseInt(card.dataset.originalAvailable || card.dataset.available);
+
+        if (!card.dataset.originalAvailable) {
+            card.dataset.originalAvailable = originalAvailable;
+        }
+        
         
         // Calcular la cantidad total en el carrito para este producto
         let inCart = 0;
