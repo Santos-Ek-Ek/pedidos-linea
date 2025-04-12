@@ -584,6 +584,7 @@ function updateAvailableStock() {
         const decrementBtn = card.querySelector('.decrement');
         const incrementBtn = card.querySelector('.increment');
         const addToCartBtn = card.querySelector('.cart-button');
+        const notaInput = card.querySelector('.nota-producto');
         if (quantityInput) {
             quantityInput.max = newAvailable;
             
@@ -592,6 +593,7 @@ function updateAvailableStock() {
             quantityInput.disabled = isDisabled;
             if (decrementBtn) decrementBtn.disabled = isDisabled;
             if (incrementBtn) incrementBtn.disabled = isDisabled;
+            if (notaInput) notaInput.disabled = isDisabled;
             if (addToCartBtn) {
                 addToCartBtn.style.pointerEvents = isDisabled ? 'none' : 'auto';
                 addToCartBtn.style.opacity = isDisabled ? '0.5' : '1';
