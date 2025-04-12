@@ -138,7 +138,7 @@
                                                                     </li>
                                                                     <!-- End submenu (sub-master) -->
                 
-                                                                    <!-- <li><a href="contact-us.html">Contactanos</a></li> -->
+                                                                    <li><a href="contactanos">Contactanos</a></li>
                 
                                                                 </ul>
                                                                 <!-- End menu list -->
@@ -303,7 +303,7 @@
                                         <div class="container-fluid mt-4">
     <ul class="product-list" id="product-list-container">
         @foreach($productos as $producto)
-        <li class="product-list-card item-card mb-32" data-product-id="{{ $producto->id }}" data-price="{{ $producto->precio }}"  data-category="{{ $producto->categoria->nombre }}" data-available="{{ $producto->disponibles }}" data-original-available="{{ $producto->disponibles }}">
+        <li class="product-list-card item-card mb-32" style="list-style: none;" data-product-id="{{ $producto->id }}" data-price="{{ $producto->precio }}"  data-category="{{ $producto->categoria->nombre }}" data-available="{{ $producto->disponibles }}" data-original-available="{{ $producto->disponibles }}">
             <div class="row">
                 <div class="col-md-4">
                     <div class="product-img text-center">

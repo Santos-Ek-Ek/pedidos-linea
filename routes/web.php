@@ -37,6 +37,9 @@ Route::get('/carrito', function () {
 Route::get('/checkout', function () {
     return view('contenido.checkout');
 });
+Route::get('/contactanos', function () {
+    return view('contenido.contactanos');
+});
 
 Route::post('/guardar-pedido', [PedidoController::class, 'store'])
      ->name('pedidos.store')

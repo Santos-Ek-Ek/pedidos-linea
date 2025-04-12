@@ -31,6 +31,18 @@ class PedidoController extends Controller
     
         $productos = json_decode($request->productos, true);
         $cliente = Auth::user();
+
+            // Verificar stock antes de procesar el pedido
+    foreach ($productos as $producto) {
+        $productoModel = Producto::find($producto['id']);
+        if (!$productoModel) {
+            return back()->with('error', 'Uno de los productos no existe');
+        }
+        
+        if ($productoModel->disponibles < $producto['quantity']) {
+            return back()->with('error', 'No hay suficiente stock para el producto: ' . $productoModel->nombre);
+        }
+    }
         
         // Calcular total general
         $subtotal = collect($productos)->sum(function($producto) {
@@ -47,6 +59,11 @@ class PedidoController extends Controller
         // Crear pedidos
         $pedidosData = [];
         foreach ($productos as $producto) {
+        // Actualizar el stock del producto
+        $productoModel = Producto::find($producto['id']);
+        $productoModel->disponibles -= $producto['quantity'];
+        $productoModel->save();
+
             $pedido = pedidos::create([
                 'cliente_id' => $cliente->id,
                 'producto_id' => $producto['id'],
