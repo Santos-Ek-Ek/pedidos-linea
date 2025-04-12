@@ -581,12 +581,37 @@ function updateAvailableStock() {
         
         // Actualizar el input de cantidad
         const quantityInput = card.querySelector('.number');
+        const decrementBtn = card.querySelector('.decrement');
+        const incrementBtn = card.querySelector('.increment');
+        const addToCartBtn = card.querySelector('.cart-button');
         if (quantityInput) {
             quantityInput.max = newAvailable;
             
-            // Si el valor actual excede el nuevo máximo, ajustarlo
-            if (parseInt(quantityInput.value) > newAvailable) {
-                quantityInput.value = newAvailable > 0 ? newAvailable : 1;
+            const isDisabled = newAvailable <= 0;
+            
+            quantityInput.disabled = isDisabled;
+            if (decrementBtn) decrementBtn.disabled = isDisabled;
+            if (incrementBtn) incrementBtn.disabled = isDisabled;
+            if (addToCartBtn) {
+                addToCartBtn.style.pointerEvents = isDisabled ? 'none' : 'auto';
+                addToCartBtn.style.opacity = isDisabled ? '0.5' : '1';
+                addToCartBtn.onclick = isDisabled ? null : function() { addToCart(this); };
+            }
+            
+            // Mostrar mensaje si no hay stock
+            const stockMessage = card.querySelector('.stock-message');
+            if (isDisabled) {
+                if (!stockMessage) {
+                    const message = document.createElement('div');
+                    message.className = 'stock-message text-danger mt-2';
+                    message.textContent = 'Agotado';
+                    const actionBlock = card.querySelector('.action-block');
+                    if (actionBlock) {
+                        actionBlock.appendChild(message);
+                    }
+                }
+            } else if (stockMessage) {
+                stockMessage.remove();
             }
         }
     });
