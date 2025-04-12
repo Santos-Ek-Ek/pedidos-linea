@@ -48,6 +48,8 @@
                     <!-- Hero Section Start -->
                     <section class="inner-page-banner">
                         <!-- Header start -->
+
+                        <!-- Header start -->
                         <header id="ui-header">
                             <div class="ui-header-inner container-fluid"> 
 
@@ -55,9 +57,8 @@
                                     <!-- header Logo  -->
                                     <div class="ui-logo"> 
                                         <a href="">
-                                        <img src="img/laterraza.png" class="ui-logo-light" alt="Logo"> <!-- logo light -->
-                                        <img src="img/laterraza.png" class="ui-logo-dark" alt="Logo"> <!-- logo dark -->
-
+                                            <img src="img/laterraza.png" class="ui-logo-light" alt="Logo"> <!-- logo light -->
+                                            <img src="img/laterraza.png" class="ui-logo-dark" alt="Logo"> <!-- logo dark -->
                                         </a>
                                     </div>
                                 </div>
@@ -182,7 +183,7 @@
             <i class="fa-regular fa-user"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-            <!-- <li><a class="dropdown-item" href="">Mi Cuenta</a></li> -->
+            <li><a class="dropdown-item" href="misCompras">Mis Compras</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
                 <form method="POST" action="{{ route('logoutUser') }}">
