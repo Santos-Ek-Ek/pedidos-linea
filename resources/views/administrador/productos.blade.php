@@ -42,6 +42,11 @@
         <input type="number" name="precio" step="0.01" class="form-control" required>
         @error('precio') <span class="text-danger">{{ $message }}</span> @enderror
     </div>
+    <div class="col-md-2">
+        <label for="recipient-name" class="col-form-label">Disponibles:</label>
+        <input type="number" name="disponibles" step="0.01" class="form-control" required>
+        @error('disponibles') <span class="text-danger">{{ $message }}</span> @enderror
+    </div>
     <div class="mb-3">
         <label for="message-text" class="col-form-label">Descripción:</label>
         <textarea class="form-control" id="message-text" name="detalles"></textarea>
@@ -72,6 +77,7 @@
                     <th scope="col">DETALLES/INGREDIENTES</th>
                     <th scope="col">CATEGORÍA</th>
                     <th scope="col">PRECIO</th>
+                    <th scope="col">DISPONIBLES</th>
                     <th scope="col">ACCIONES</th>
                 </thead>
                 <tbody>
@@ -83,6 +89,7 @@
                       <td><p style="display: inline-block; max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: normal; word-wrap: break-word;">{{$items->detalle}}</p></td>
                       <td>{{$items->categoria->nombre}}</td>
                       <td>{{$items->precio}}</td>
+                      <td>{{$items->disponibles}}</td>
                       <td>
                 
                 <a onclick="confirmDelete({{ $items->id }})" class="btn btn-outline-danger" style="margin-top: 40px; align-items: center; margin-left:10px;">

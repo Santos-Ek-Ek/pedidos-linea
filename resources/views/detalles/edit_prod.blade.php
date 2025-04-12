@@ -23,6 +23,10 @@
             <label class="col-form-label">Precio:</label>
             <input type="number" step="0.01" class="form-control" name="precio" value="{{ $producto->precio }}" required>
         </div>
+        <div class="col-md-3">
+            <label class="col-form-label">Disponibles:</label>
+            <input type="number" step="0.01" class="form-control" name="disponibles" value="{{ $producto->disponibles }}" required>
+        </div>
         
         <div class="col-md-6">
             <label class="col-form-label">Imagen actual:</label>

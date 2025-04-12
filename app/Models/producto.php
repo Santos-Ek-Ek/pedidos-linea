@@ -17,6 +17,7 @@ class producto extends Model
         'categoria_id',
         'precio',
         'activo',
+        'disponibles'
     ];
     public function categoria()
     {

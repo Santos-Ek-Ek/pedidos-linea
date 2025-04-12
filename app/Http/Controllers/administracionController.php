@@ -74,7 +74,8 @@ class administracionController extends Controller
                     'categoria' => 'required|exists:categorias,id',
                     'file' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                     'precio' => 'required|numeric|min:0',
-                    'detalles' => 'nullable|string'
+                    'detalles' => 'nullable|string',
+                    'disponibles' => 'required|numeric|min:1'
                 ]);
         
                 try {
@@ -99,7 +100,8 @@ class administracionController extends Controller
                         'imagen' => 'productos/' . $nombreArchivo, // Guardamos la ruta relativa
                         'precio' => $validated['precio'],
                         'detalle' => $validated['detalles'],
-                        'activo' => true
+                        'activo' => true,
+                        'disponibles' => $validated['disponibles'],
                     ]);
         
                     return redirect()->route('productos.index')
@@ -125,7 +127,8 @@ class administracionController extends Controller
         'categoria_id' => 'required|exists:categorias,id',
         'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         'precio' => 'required|numeric|min:0',
-        'detalle' => 'nullable|string'
+        'detalle' => 'nullable|string',
+        'disponibles' => 'required|numeric|min:1'
     ]);
 
     try {
