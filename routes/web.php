@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\authAdminController;
 use App\Http\Controllers\administracionController;
+use App\Http\Controllers\comprasController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ventaProductoController;
 
@@ -94,3 +95,5 @@ Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
 
      Route::put('/pedidos/{id}/update-status', [PedidoController::class, 'updateStatus'])
      ->name('pedidos.updateStatus');
+
+     Route::get('/misCompras', [comprasController::class, 'misPedidos']);

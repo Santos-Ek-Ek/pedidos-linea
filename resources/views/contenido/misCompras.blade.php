@@ -204,137 +204,61 @@
                         <!-- Header End -->
 
                         <!-- Page Title Banner Start -->
-                        <h2 class="page-title">Productos</h2>
+                        <h2 class="page-title">Mis compras</h2>
                         <!-- Page Title Banner End -->
                     </section>
                     <!-- Hero Section End -->  
 
                     <!-- Start Page Content -->
                     <div class="page-content">  
-                    @if(session('ticket'))
-    <div class="alert alert-success">
-        Pedido realizado con éxito. 
-        <a href="{{ route('tickets.download', session('ticket')) }}" target="_blank">
-            Descargar comprobante
-        </a>
-    </div>
-@endif
                         <!-- Shop Section Start -->    
                         <section class="py-80">
                             <div class="container-fluid">
                                 <div class="row">
-                                    <div class="col-xl-3">
-                                        <div class="sidebar mb-48 mb-xl-0">
-                                            <h4 class="mb-48">Filtros</h4>
-                                            <div class="sidebar-widget pt-0">
-                                                <div class="search-field">
-                                                    <div class="form-group">
-                                                        <label>Buscar</label>
-                                                        <input type="search" class="cus-form-control" id="searchInput" name="search" autocomplete="off" required placeholder="Search here...">
-                                                    </div>
-                                                    <button type="submit" class="search-btn"><i class="fa-light fa-magnifying-glass"></i></button>
-                                                </div>
-                                            </div> 
-                                            <div class="sidebar-widget">
-    <div class="widget-title-row mb-24">
-        <h5>Rango de precios</h5>
-        <span><i class="fa-light fa-horizontal-rule"></i></span>
-    </div>
-    <div class="widget-content-block">
-        <div class="price-control-row mb-24">
-            <div class="price-control">
-                <label>Mínimo</label>
-                <input type="number" class="js-input-from" value="0" min="0" id="price-min">
-            </div>
-            <div class="price-control">
-                <label>Máximo</label>
-                <input type="number" class="js-input-to" value="0" min="0" id="price-max">
-            </div>
-        </div>
-        <button id="apply-filter" class="cus-btn primary">
-            <span class="icon-wrapper">
-                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </span>
-            Aplicar Filtro
-        </button>
-        <button id="reset-filter" class="cus-btn outline mt-2">
-            <span class="icon-wrapper">
-                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </span>
-            Restablecer
-        </button>
-    </div>
-</div>
-                                            <div class="sidebar-widget">
-                                                <div class="widget-title-row mb-24">
-                                                    <h5>Categorias</h5>
-                                                    <span><i class="fa-light fa-horizontal-rule"></i></span>
-                                                </div>
-                                                <div class="widget-content-block">
-                                                    <ul class="filter-list unstyled">
-                                                    @foreach ($categorias as $index => $categoria)
-<li>
-    <div class="filter-checkbox">
-        <input type="checkbox" id="category-{{ $index }}">
-        <label for="category-{{ $index }}">{{ $categoria->nombre }}</label>
-    </div>
-</li>
-@endforeach
-                                                    </ul>
-                                                </div>
-                                           </div>
-                                        </div>
-                                    </div>
+             
                                     <div class="col-xl-9">
-                                        <div class="filter-row-2 mb-48">
-                                            <h4>Lista de productos</h4>
-                                            <div class="right-filters">
-                                                <ul class="unstyled layout-filter">
-                                                    <li class="filter-btn active"><a href=""><i class="fa-regular fa-list-ul"></i></a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
+        
                                         <!-- Products List -->
 
                                         <div class="container-fluid mt-4">
     <ul class="product-list" id="product-list-container">
-        @foreach($productos as $producto)
-        <li class="product-list-card item-card mb-32" data-product-id="{{ $producto->id }}" data-price="{{ $producto->precio }}"  data-category="{{ $producto->categoria->nombre }}">
+@foreach ($pedidos as $pedido)
+
+        <li class="product-list-card item-card mb-32">
             <div class="row">
                 <div class="col-md-4">
                     <div class="product-img text-center">
-                        <img src="{{ $producto->imagen }}" alt="{{ $producto->nombre }}" style="max-height: 200px;">
+                        <img src="{{ $pedido->producto_imagen }}" alt="{{ $pedido->producto_nombre }}" style="max-height: 200px;">
                     </div>
                 </div>
                 <div class="col-md-8">
                     <div class="info text-md-start text-center">
-                        <a href="#" class="h4 title mb-16">{{ $producto->nombre }}</a>
-                        <div class="rating mb-16">
-                            <!-- Estrellas de rating -->
+                        <a class="h4 title mb-16">{{ $pedido->producto_nombre }} ({{ $pedido->metodo_entrega }})</a>
+                        <h4 class="price mb-24">${{ $pedido->total }}  ({{ $pedido->metodo_pago }})</h4> <h5></h5>
+                        <div class="mb-16">
+                            <label for="nota-" class="form-label">Dirrección de entrega: ({{ $pedido->horario_entrega }})</label>
+                            <input type="text" class="form-control nota-producto" id="nota-" 
+                                   placeholder="----" value="{{ $pedido->direccion }} ({{ $pedido->telefono }})" readonly>
                         </div>
-                        <h4 class="price mb-24">${{ number_format($producto->precio, 2) }}</h4>
-                        <p class="lead desc mb-32">{{ $producto->detalle }}</p>
-                        
                         <!-- Campo para notas especiales -->
                         <div class="mb-16">
-                            <label for="nota-{{ $producto->id }}" class="form-label">Notas especiales:</label>
-                            <input type="text" class="form-control nota-producto" id="nota-{{ $producto->id }}" 
-                                   placeholder="Ej: sin cebolla, poco picante, etc." data-product-id="{{ $producto->id }}">
+                            <label for="nota-" class="form-label">Notas especiales:</label>
+                            <input type="text" class="form-control nota-producto" id="nota-" 
+                                   placeholder="----" value="{{ $pedido->notas }}" readonly>
                         </div>
                         
                         <div class="action-block">
                             <div class="quantity quantity-wrap">
-                                <div class="decrement"><i class="fa-solid fa-dash"></i></div>
-                                <input type="text" name="quantity" value="1" maxlength="2" size="1" class="number">
-                                <div class="increment"><i class="fa-solid fa-plus-large"></i></div>
+                            
+                                <input type="text" name="quantity" value="{{ $pedido->cantidad }}" maxlength="2" size="1" class="number" readonly>
+                                
                             </div>
-                            <a href="javascript:;" class="cart-btn cart-button" onclick="addToCart(this)">
-                                <img src="assets/media/icons/shopping-cart.png" alt="">
-                            </a>
+                            <a href="{{ asset($pedido->ticket_path) }}" 
+           target="_blank" 
+           class="ticket-link"
+           title="Ver ticket">
+            <i class="fas fa-file-pdf"></i> Ver
+        </a>
                         </div>
                     </div>
                 </div>
@@ -374,17 +298,7 @@
         <!-- End scroll container -->
 
         <!-- Search Popup Start -->
-        <div class="search-popup">
-            <div class="search-popup__overlay search-toggler"></div>
-            <div class="search-popup__content text-center">
-                <form role="search" method="get" class="search-popup__form" action="https://uiparadox.co.uk/public/templates/royalfare/shop-list-1.html">
-                    <div class="blur-layer">
-                        <input type="text" id="search" autocomplete="off" placeholder="Search Here...">
-                    </div>
-                    <button type="submit"><i class="fal fa-search"></i></button>
-                </form>
-            </div>
-        </div>
+
         <!-- Search Popup End -->
 
         <!-- Mini Cart Start -->
