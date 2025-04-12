@@ -11,6 +11,7 @@ class ventaProductoController extends Controller
     public function index()
     {
         $productos = producto::with('categoria')
+        ->where('disponibles', '>', 0)
         ->where('activo', 1)
         ->orderBy('nombre')
         ->get();
