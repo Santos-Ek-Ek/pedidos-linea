@@ -452,6 +452,20 @@
 let cart = [];
 // Función para configurar los controles de cantidad en los productos
 function setupQuantityControls() {
+    // Primero eliminamos cualquier evento previo para evitar duplicados
+    document.querySelectorAll('.quantity-wrap').forEach(wrap => {
+        const input = wrap.querySelector('.number');
+        const decrement = wrap.querySelector('.decrement');
+        const increment = wrap.querySelector('.increment');
+        
+        // Clonamos los elementos para eliminar los event listeners
+        const newDecrement = decrement.cloneNode(true);
+        const newIncrement = increment.cloneNode(true);
+        decrement.parentNode.replaceChild(newDecrement, decrement);
+        increment.parentNode.replaceChild(newIncrement, increment);
+    });
+
+    // Ahora configuramos los controles correctamente
     document.querySelectorAll('.quantity-wrap').forEach(wrap => {
         const input = wrap.querySelector('.number');
         const decrement = wrap.querySelector('.decrement');
@@ -480,38 +494,23 @@ function setupQuantityControls() {
             }
         };
         
-        // Evento para incrementar
-        increment.addEventListener('click', (e) => {
+        // Evento para incrementar - con prevención de doble clic
+        increment.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopImmediatePropagation(); // Prevenir otros manejadores del mismo evento
             updateValue(parseInt(input.value || getMin()) + 1);
-        });
+        }, {once: false});
         
-        // Evento para decrementar
-        decrement.addEventListener('click', (e) => {
+        // Evento para decrementar - con prevención de doble clic
+        decrement.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopImmediatePropagation(); // Prevenir otros manejadores del mismo evento
             updateValue(parseInt(input.value || getMin()) - 1);
-        });
+        }, {once: false});
         
         // Evento para cambios manuales
-        input.addEventListener('change', () => {
+        input.addEventListener('change', function() {
             updateValue(parseInt(input.value) || getMin());
-        });
-        
-        // Evento para prevenir entrada no numérica
-        input.addEventListener('keydown', (e) => {
-            // Permitir: backspace, delete, tab, escape, enter, puntos
-            if ([46, 8, 9, 27, 13, 110, 190].includes(e.keyCode) || 
-                // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                (e.keyCode === 65 && e.ctrlKey === true) || 
-                (e.keyCode === 67 && e.ctrlKey === true) || 
-                (e.keyCode === 86 && e.ctrlKey === true) || 
-                (e.keyCode === 88 && e.ctrlKey === true) ||
-                // Permitir: números del teclado principal o numérico
-                (e.keyCode >= 48 && e.keyCode <= 57) || 
-                (e.keyCode >= 96 && e.keyCode <= 105)) {
-                return;
-            }
-            e.preventDefault();
         });
         
         // Validación inicial
@@ -556,6 +555,37 @@ function clearCart() {
     window.dispatchEvent(new Event('cartCleared'));
 }
 
+// Función para actualizar el stock disponible en los productos
+function updateAvailableStock() {
+    document.querySelectorAll('.product-list-card').forEach(card => {
+        const productId = card.dataset.productId;
+        const originalAvailable = parseInt(card.dataset.originalAvailable || card.dataset.available);
+        
+        // Calcular la cantidad total en el carrito para este producto
+        let inCart = 0;
+        cart.forEach(item => {
+            if (item.id === productId) {
+                inCart += item.quantity;
+            }
+        });
+        
+        // Calcular el nuevo disponible
+        const newAvailable = originalAvailable - inCart;
+        card.dataset.available = newAvailable;
+        
+        // Actualizar el input de cantidad
+        const quantityInput = card.querySelector('.number');
+        if (quantityInput) {
+            quantityInput.max = newAvailable;
+            
+            // Si el valor actual excede el nuevo máximo, ajustarlo
+            if (parseInt(quantityInput.value) > newAvailable) {
+                quantityInput.value = newAvailable > 0 ? newAvailable : 1;
+            }
+        }
+    });
+}
+
 // Función para añadir producto al carrito con validación de stock
 function addToCart(button) {
     const productCard = button.closest('.product-list-card');
@@ -575,11 +605,14 @@ function addToCart(button) {
         return;
     }
 
+
+    if (!productCard.dataset.originalAvailable) {
+        productCard.dataset.originalAvailable = availableStock;
+    }
     // Buscar producto existente con la misma nota
     const existingIndex = cart.findIndex(item => 
         item.id === productId && item.nota === nota
     );
-
     if (existingIndex >= 0) {
         // Verificar stock al actualizar cantidad
         const newTotalQuantity = cart[existingIndex].quantity + quantity;
@@ -600,7 +633,7 @@ function addToCart(button) {
             maxQuantity: availableStock // Guardamos el stock máximo
         });
     }
-
+    updateAvailableStock(); 
     updateCartView();
     saveCartToStorage();
     showToast(`${productName} añadido al carrito (${quantity} unidades)`);
@@ -701,6 +734,7 @@ function updateCartQuantity(index, change) {
     }
     
     cart[index].quantity = newQuantity;
+    updateAvailableStock();
     updateCartView();
     saveCartToStorage();
 }
@@ -709,6 +743,7 @@ function updateCartQuantity(index, change) {
 function removeFromCart(index) {
     if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
         cart.splice(index, 1);
+        updateAvailableStock();
         updateCartView();
         saveCartToStorage();
         showToast('Producto eliminado del carrito');
@@ -725,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearCart();
         window.history.replaceState({}, document.title, window.location.pathname);
     }
-    
+    updateAvailableStock(); 
     syncCartFromStorage();
     setupQuantityControls();
     
