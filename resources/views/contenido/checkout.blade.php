@@ -517,6 +517,7 @@
         productosInput.value = JSON.stringify(getCart());
     }
 
+
     // Función para calcular y mostrar el total con/sin costo de envío
     function calculateTotal(subtotal, deliveryOption) {
         const deliveryCost = 5.00;
@@ -638,7 +639,294 @@
     });
 });
 </script>
+<script>
+// Función para obtener el carrito del localStorage
+function getCart() {
+    const cartData = localStorage.getItem('shoppingCart');
+    return cartData ? JSON.parse(cartData) : [];
+}
 
+// Función para actualizar el mini carrito
+function updateMiniCart() {
+    const cart = getCart();
+    const cartItemsContainer = document.getElementById('cart-items');
+    const subtotalElement = document.getElementById('cart-subtotal');
+    
+    cartItemsContainer.innerHTML = '';
+    
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<li class="empty-cart-message">Tu carrito está vacío</li>';
+        subtotalElement.textContent = '$0.00';
+        return;
+    }
+    
+    let subtotal = 0;
+    
+    cart.forEach((product, index) => {
+        const productTotal = product.price * product.quantity;
+        subtotal += productTotal;
+        
+        const productItem = document.createElement('li');
+        productItem.className = 'product-item mb-24';
+        productItem.innerHTML = `
+            <a href="">
+                <span class="item-image">
+                    <img src="${product.image}" alt="${product.name}">
+                </span>
+            </a>
+            <div class="product-text">
+                <a href="">
+                    <h6 class="mb-16 dark-gray">${product.name}</h6>
+                    ${product.nota ? `<span class="nota-especial">Nota: ${product.nota}</span>` : ''}
+                </a>
+                <div class="qp_row">
+                    <div class="quantity quantity-wrap">
+                        <div class="decrement" data-index="${index}"><i class="fa-solid fa-dash"></i></div>
+                        <input type="number" name="quantity" value="${product.quantity}" min="1" 
+                               max="${product.maxQuantity}" class="number" id="cart-qty-${index}">
+                        <div class="increment" data-index="${index}"><i class="fa-solid fa-plus-large"></i></div>
+                    </div>
+                    <h5 class="dark-gray">$${productTotal.toFixed(2)}</h5>
+                    <button class="remove-item" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+        
+        cartItemsContainer.appendChild(productItem);
+        
+        if (index < cart.length - 1) {
+            const divider = document.createElement('li');
+            divider.className = 'vr-line mb-24';
+            cartItemsContainer.appendChild(divider);
+        }
+    });
+    
+    // Agregar event listeners a los nuevos elementos
+    document.querySelectorAll('.decrement').forEach(btn => {
+        btn.addEventListener('click', function() {
+            updateCartQuantity(parseInt(this.getAttribute('data-index')), -1);
+        });
+    });
+    
+    document.querySelectorAll('.increment').forEach(btn => {
+        btn.addEventListener('click', function() {
+            updateCartQuantity(parseInt(this.getAttribute('data-index')), 1);
+        });
+    });
+    
+    document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', function() {
+            removeFromCart(parseInt(this.getAttribute('data-index')));
+        });
+    });
+    
+    document.querySelectorAll('.number').forEach(input => {
+        input.addEventListener('change', function() {
+            const index = parseInt(this.id.replace('cart-qty-', ''));
+            validateCartQuantity(index, this);
+        });
+    });
+    
+    subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+}
+
+// Función para actualizar cantidad en el carrito
+function updateCartQuantity(index, change) {
+    const cart = getCart();
+    const newQuantity = cart[index].quantity + change;
+    
+    if (newQuantity >= 1 && newQuantity <= cart[index].maxQuantity) {
+        cart[index].quantity = newQuantity;
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+        updateMiniCart();
+    }
+}
+
+// Función para validar cantidad manualmente ingresada
+function validateCartQuantity(index, input) {
+    const cart = getCart();
+    const newQuantity = parseInt(input.value);
+    const maxQuantity = cart[index].maxQuantity;
+    
+    if (isNaN(newQuantity)) {
+        input.value = 1;
+        cart[index].quantity = 1;
+    } else if (newQuantity < 1) {
+        input.value = 1;
+        cart[index].quantity = 1;
+    } else if (newQuantity > maxQuantity) {
+        input.value = maxQuantity;
+        cart[index].quantity = maxQuantity;
+    } else {
+        cart[index].quantity = newQuantity;
+    }
+    
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    updateMiniCart();
+}
+
+// Función para eliminar producto del carrito
+function removeFromCart(index) {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+        const cart = getCart();
+        cart.splice(index, 1);
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+        updateMiniCart();
+    }
+}
+
+// Inicialización cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar el botón del carrito
+    document.querySelector('.cart-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        updateMiniCart();
+        document.getElementById('sidebar-cart').classList.add('active');
+        document.getElementById('sidebar-cart-curtain').classList.add('active');
+    });
+
+    // Configurar el botón de cerrar
+    document.querySelector('.close-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('sidebar-cart').classList.remove('active');
+        document.getElementById('sidebar-cart-curtain').classList.remove('active');
+    });
+
+    // Configurar la cortina de fondo
+    document.getElementById('sidebar-cart-curtain').addEventListener('click', function() {
+        document.getElementById('sidebar-cart').classList.remove('active');
+        this.classList.remove('active');
+    });
+
+    // Escuchar cambios en el localStorage
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            updateMiniCart();
+        }
+    });
+    
+    // Actualizar el mini carrito al cargar la página
+    updateMiniCart();
+});
+</script>
+<style>
+/* Estilos para el mini carrito */
+#sidebar-cart {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    background: #fff;
+    z-index: 9999;
+    padding: 30px;
+    overflow-y: auto;
+    transition: right 0.3s ease;
+}
+
+#sidebar-cart.active {
+    right: 0;
+}
+
+#sidebar-cart-curtain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+#sidebar-cart-curtain.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.product-item {
+    display: flex;
+    gap: 15px;
+}
+
+.product-item .item-image {
+    width: 80px;
+    height: 80px;
+    display: block;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.product-item .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.qp_row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.quantity-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.quantity-wrap .decrement,
+.quantity-wrap .increment {
+    padding: 5px 10px;
+    cursor: pointer;
+    background: #f5f5f5;
+    border: none;
+}
+
+.quantity-wrap .decrement:hover,
+.quantity-wrap .increment:hover {
+    background: #e0e0e0;
+}
+
+.quantity-wrap input.number {
+    width: 40px;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    text-align: center;
+    padding: 5px 0;
+}
+
+.empty-cart-message {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.remove-item:hover {
+    color: #cc0000;
+}
+
+.nota-especial {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+</style>
     <style>
     /* Estilos adicionales para mejorar la presentación */
     #order-summary small.text-muted {

@@ -294,7 +294,7 @@
                                             <h4>Lista de productos</h4>
                                             <div class="right-filters">
                                                 <ul class="unstyled layout-filter">
-                                                    <li class="filter-btn active"><a href=""><i class="fa-regular fa-list-ul"></i></a></li>
+                                                    <!-- <li class="filter-btn active"><a href=""><i class="fa-regular fa-list-ul"></i></a></li> -->
                                                 </ul>
                                             </div>
                                         </div>
