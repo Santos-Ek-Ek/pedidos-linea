@@ -223,8 +223,8 @@
                                                 <img src="assets/media/icons/Location.png" alt="">
                                             </div>
                                             <div class="text-center">
-                                                <h4 class="mb-24">Ubicación</h4>
-                                                <p class="lead">97460 Calle 21 x 10 y 12<br> Cacalchén, Yucatán.</p>
+                                                <h4 class="mb-24">UBICACIÓN</h4>
+                                                <p class="lead" style="color:blue;">97460 Calle 21 x 10 y 12<br> Cacalchén, Yucatán.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -234,8 +234,8 @@
                                                 <img src="assets/media/icons/Mail.png" alt="">
                                             </div>
                                             <div class="text-center">
-                                                <h4 class="mb-24">correo eléctronico</h4>
-                                                <p class="lead"><a href="mailto:info@example.com" class="mb-4p">gilmereb37@gmail.com</a></p>
+                                                <h4 class="mb-24">CORREO ELÉCTRONICO</h4>
+                                                <p class="lead" style="color:blue;"><a href="mailto:info@example.com" class="mb-4p">gilmereb37@gmail.com</a></p>
                                                 <!-- <p class="lead"><a href="mailto:info@example.com">email@info.com</a></p> -->
                                             </div>
                                         </div>
@@ -246,8 +246,8 @@
                                                 <img src="assets/media/icons/Telephone.png" alt="">
                                             </div>
                                             <div class="text-center">
-                                                <h4 class="mb-24">Numeros de telefono</h4>
-                                                <p class="lead"><a href="tel:1234567889" class="mb-4p">(+52) 999 109 6674</a></p>
+                                                <h4 class="mb-24">NÚMERO DE TELÉFONO</h4>
+                                                <p class="lead" style="color:blue;"><a  class="mb-4p">(+52) 999 109 6674</a></p>
                                                 <!-- <p class="lead"><a href="tel:1234567889">(+52) 9911073067</a></p> -->
                                             </div>
                                         </div>
@@ -259,7 +259,7 @@
                                             </div>
                                             <div class="text-center">
                                                 <h4 class="mb-24">HORA DE APERTURA</h4>
-                                                <p class="lead">TODOS LOS DIAS!!!!!! de 09:00am de<br>11:00pm</p>
+                                                <p class="lead" style="color:blue;">TODOS LOS DIAS!!!!!! de 09:00am de<br>11:00pm</p>
                                             </div>
                                         </div>
                                     </div>
@@ -358,6 +358,498 @@
         <script src="assets/js/vendor/jquery.nice-select.min.js"></script>
         <script src="assets/js/vendor/slick.min.js"></script>
         <script src="assets/js/app.js"></script>
+
+        <script>
+// Funciones globales para manejar el carrito
+function getCart() {
+    const cartData = localStorage.getItem('shoppingCart');
+    return cartData ? JSON.parse(cartData) : [];
+}
+
+function saveCart(cartData) {
+    if (cartData.length > 0) {
+        localStorage.setItem('shoppingCart', JSON.stringify(cartData));
+    } else {
+        localStorage.removeItem('shoppingCart');
+    }
+    // Disparar evento de actualización
+    const event = new Event('cartUpdated');
+    window.dispatchEvent(event);
+}
+
+function clearCart() {
+    localStorage.removeItem('shoppingCart');
+    // Disparar evento de limpieza
+    const event = new Event('cartCleared');
+    window.dispatchEvent(event);
+}
+
+// Función para actualizar la vista del minicarrito
+function updateMiniCartView() {
+    const cart = getCart();
+    const cartItemsContainer = document.getElementById('cart-items');
+    const subtotalElement = document.getElementById('cart-subtotal');
+    
+    cartItemsContainer.innerHTML = '';
+    
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<li class="empty-cart-message">Tu carrito está vacío</li>';
+        subtotalElement.textContent = '$0.00';
+        return;
+    }
+    
+    let subtotal = 0;
+    
+    cart.forEach((product, index) => {
+        const productTotal = product.price * product.quantity;
+        subtotal += productTotal;
+        
+        const productItem = document.createElement('li');
+        productItem.className = 'product-item mb-24';
+        productItem.innerHTML = `
+            <a href="">
+                <span class="item-image">
+                    <img src="${product.image}" alt="${product.name}">
+                </span>
+            </a>
+            <div class="product-text">
+                <a href="">
+                    <h6 class="mb-16 dark-gray">${product.name}</h6>
+                    ${product.nota ? `<span class="nota-especial">Nota: ${product.nota}</span>` : ''}
+                </a>
+                <div class="qp_row">
+                    <div class="quantity quantity-wrap">
+                        <div class="decrement" onclick="updateCartQuantity(${index}, -1)"><i class="fa-solid fa-dash"></i></div>
+                        <input type="number" name="quantity" value="${product.quantity}" min="1" 
+                               max="${product.maxQuantity}" class="number" id="cart-qty-${index}"
+                               onchange="validateCartQuantity(${index}, this)">
+                        <div class="increment" onclick="updateCartQuantity(${index}, 1)"><i class="fa-solid fa-plus-large"></i></div>
+                    </div>
+                    <h5 class="dark-gray">$${productTotal.toFixed(2)}</h5>
+                    <button class="remove-item" onclick="removeFromCart(${index})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+        
+        cartItemsContainer.appendChild(productItem);
+        
+        if (index < cart.length - 1) {
+            const divider = document.createElement('li');
+            divider.className = 'vr-line mb-24';
+            cartItemsContainer.appendChild(divider);
+        }
+    });
+    
+    subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+}
+
+// Función para validar cantidad manualmente ingresada
+function validateCartQuantity(index, input) {
+    const cart = getCart();
+    const value = parseInt(input.value);
+    const max = parseInt(input.max);
+    
+    if (isNaN(value)) {
+        input.value = 1;
+    } else if (value < 1) {
+        input.value = 1;
+    } else if (value > max) {
+        input.value = max;
+        showToast(`No puedes pedir más de ${max} unidades de este producto.`, true);
+    }
+    
+    cart[index].quantity = parseInt(input.value);
+    saveCart(cart);
+    updateMiniCartView();
+}
+
+// Función para actualizar cantidad en el carrito
+function updateCartQuantity(index, change) {
+    const cart = getCart();
+    const newQuantity = cart[index].quantity + change;
+    const maxQuantity = cart[index].maxQuantity;
+    
+    if (newQuantity < 1) return;
+    
+    if (newQuantity > maxQuantity) {
+        showToast(`No puedes pedir más de ${maxQuantity} unidades de este producto.`, true);
+        return;
+    }
+    
+    cart[index].quantity = newQuantity;
+    saveCart(cart);
+    updateMiniCartView();
+}
+
+// Función para eliminar producto del carrito
+function removeFromCart(index) {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+        const cart = getCart();
+        cart.splice(index, 1);
+        saveCart(cart);
+        updateMiniCartView();
+        showToast('Producto eliminado del carrito');
+    }
+}
+
+// Función para mostrar notificación tipo toast
+function showToast(message, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${isError ? 'error' : ''}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// Inicialización del carrito
+document.addEventListener('DOMContentLoaded', function() {
+    updateMiniCartView();
+    
+    // Escuchar eventos de actualización del carrito
+    window.addEventListener('cartUpdated', updateMiniCartView);
+    window.addEventListener('cartCleared', updateMiniCartView);
+    
+    // Escuchar eventos de storage entre pestañas
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            updateMiniCartView();
+        }
+    });
+});
+
+// Función para renderizar los productos en la tabla (versión desktop)
+function renderCartItems() {
+    const cart = getCart();
+    const cartTableBody = document.getElementById('cart-table-body');
+    const mobileCartItems = document.getElementById('mobile-cart-items');
+    const subtotalElement = document.getElementById('cart-subtotal');
+    const totalElement = document.getElementById('cart-total');
+    
+    if (cart.length === 0) {
+        cartTableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center py-4">Tu carrito está vacío</td>
+            </tr>
+        `;
+        mobileCartItems.innerHTML = `
+            <div class="col-12 text-center py-4">
+                <p>Tu carrito está vacío</p>
+            </div>
+        `;
+        updateTotals();
+        return;
+    }
+    
+    cartTableBody.innerHTML = '';
+    mobileCartItems.innerHTML = '';
+    
+    cart.forEach((product, index) => {
+        const productTotal = product.price * product.quantity;
+        
+        // Versión desktop (tabla)
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="product-block">
+                <a href="#" class="remove-from-cart-btn" onclick="removeFromCartPage(${index})">
+                    <i class="fa-light fa-xmark"></i>
+                </a>
+                <img src="${product.image}" alt="${product.name}">
+                <div>
+                    <a href="product-detail.html" class="h6">${product.name}</a>
+                    ${product.nota ? `<div class="nota-especial">Nota: ${product.nota}</div>` : ''}
+                </div>
+            </td>
+            <td>
+                <p class="lead color-black">$${product.price.toFixed(2)}</p>
+            </td>
+            <td>
+                <div class="quantity quantity-wrap">
+                    <div class="decrement" onclick="updateQuantity(${index}, -1)">
+                        <i class="fa-solid fa-dash"></i>
+                    </div>
+                    <input type="text" name="quantity" value="${product.quantity}" 
+                           maxlength="2" size="1" class="number" id="qty-${index}">
+                    <div class="increment" onclick="updateQuantity(${index}, 1)">
+                        <i class="fa-solid fa-plus-large"></i>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <h6>$${productTotal.toFixed(2)}</h6>
+            </td>
+        `;
+        cartTableBody.appendChild(row);
+        
+        // Versión móvil
+        const mobileItem = document.createElement('div');
+        mobileItem.className = 'col-lg-6 col-sm-6';
+        mobileItem.innerHTML = `
+            <div class="cart-item-card text-center mb-32">
+                <a href="#" class="remove-from-cart-btn" onclick="removeFromCartPage(${index})">
+                    <i class="fa-light fa-xmark"></i>
+                </a>
+                <div class="product-img mb-16">
+                    <img src="${product.image}" alt="${product.name}" class="mx-auto">
+                </div>
+                <div class="mb-8">
+                    <a href="product-detail.html" class="h5 title">${product.name}</a>
+                    ${product.nota ? `<div class="nota-especial-mobile">Nota: ${product.nota}</div>` : ''}
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-16">
+                    <h6>Precio:</h6>
+                    <p class="lead color-black">$${product.price.toFixed(2)}</p>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-16">
+                    <h6>Cantidad:</h6>
+                    <div class="quantity quantity-wrap">
+                        <div class="decrement" onclick="updateQuantity(${index}, -1)">
+                            <i class="fa-solid fa-dash"></i>
+                        </div>
+                        <input type="text" name="quantity" value="${product.quantity}" 
+                               maxlength="2" size="1" class="number" id="mobile-qty-${index}">
+                        <div class="increment" onclick="updateQuantity(${index}, 1)">
+                            <i class="fa-solid fa-plus-large"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6>Total:</h6>
+                    <h6>$${productTotal.toFixed(2)}</h6>
+                </div>
+            </div>
+        `;
+        mobileCartItems.appendChild(mobileItem);
+    });
+    
+    updateTotals();
+}
+
+function updateTotals() {
+    const cart = getCart();
+    // const deliveryCost = 5.00; // Costo fijo de envío
+    
+    // Calcular subtotal
+    const subtotal = cart.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+    
+    // Actualizar elementos del DOM
+    document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+    // document.getElementById('delivery-cost').textContent = `$${deliveryCost.toFixed(2)}`;
+    
+    // Calcular total
+    const total = subtotal;
+    document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+}
+
+// Función para actualizar la cantidad (disponible globalmente)
+function updateQuantity(index, change) {
+    const cart = getCart();
+    const newQuantity = cart[index].quantity + change;
+    if (newQuantity < 1) return;
+    
+    cart[index].quantity = newQuantity;
+    saveCart(cart);
+    renderCartItems();
+    updateMiniCartView();
+}
+
+// Función para eliminar producto del carrito (disponible globalmente)
+function removeFromCartPage(index) {
+    const cart = getCart();
+    cart.splice(index, 1);
+    saveCart(cart);
+    renderCartItems();
+    updateMiniCartView();
+}
+
+// Inicializar la vista del carrito principal
+document.addEventListener('DOMContentLoaded', function() {
+    renderCartItems();
+});
+</script>
+<style>
+/* Estilos para el minicarrito */
+#sidebar-cart {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    background: #fff;
+    z-index: 9999;
+    padding: 32px;
+    overflow-y: auto;
+    transition: all 0.5s ease;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+#sidebar-cart.active {
+    right: 0;
+}
+
+#sidebar-cart-curtain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+
+#sidebar-cart-curtain.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.product-item {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.product-item .item-image {
+    width: 80px;
+    height: 80px;
+    display: block;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.product-item .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-text {
+    flex: 1;
+}
+
+.qp_row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.remove-item:hover {
+    color: #cc0000;
+}
+
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast-notification.error {
+    background: #ff4444;
+}
+
+.toast-notification.fade-out {
+    animation: fadeOut 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { bottom: -50px; opacity: 0; }
+    to { bottom: 20px; opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Estilos para el carrito principal */
+.remove-from-cart-btn {
+    color: #ff4444;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.remove-from-cart-btn:hover {
+    color: #cc0000;
+}
+
+.quantity-wrap .decrement, 
+.quantity-wrap .increment {
+    cursor: pointer;
+    user-select: none;
+}
+
+.cart-table img {
+    max-width: 80px;
+    height: auto;
+}
+
+.product-block {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cart-item-card {
+    position: relative;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.cart-item-card .remove-from-cart-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.empty-cart-message {
+    text-align: center;
+    padding: 40px 0;
+    color: #666;
+}
+
+.nota-especial {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+    display: block;
+}
+
+.nota-especial-mobile {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    font-style: italic;
+    display: block;
+}
+
+.product-block > div {
+    flex: 1;
+}
+</style>
 
     </body>
 
