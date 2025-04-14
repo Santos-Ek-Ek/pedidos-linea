@@ -344,6 +344,11 @@
             </label>
             <!-- Contenedor para el botón de PayPal -->
             <div id="paypal-button-container" style="display: none;margin-top: 15px;"></div>
+    <!-- Contenedor para el comprobante de pago -->
+    <div id="comprobante-pago-container" style="display: none; margin-top: 15px;">
+        <label for="comprobante-pago">Subir captura de comprobante de pago</label>
+        <input type="file" name="comprobante_pago" id="comprobante-pago" accept="image/*,.pdf">
+    </div>
         </li>
                                                 </ul>
                                             </div>
@@ -863,20 +868,48 @@ function updateOrderButtonState() {
     }
 }
 
+function validateFormBeforeSubmit(e) {
+    const cart = getCart();
+    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+    const comprobanteInput = document.getElementById('comprobante-pago');
+    
+    if (cart.length === 0) {
+        e.preventDefault();
+        alert('No puedes realizar un pedido con el carrito vacío');
+        return false;
+    }
+    
+    // Validar comprobante solo si el método es PayPal
+    if (metodoPago === 'PayPal' && comprobanteInput.files.length === 0) {
+        e.preventDefault();
+        alert('Por favor sube una captura del comprobante de pago de PayPal');
+        return false;
+    }
+    
+    // Si todo está bien, proceder con el envío
+    setTimeout(() => {
+        clearCart();
+    }, 200);
+    
+    return true;
+}
 
 // Modifica el event listener de los radios de método de pago
 document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
     radio.addEventListener('change', function() {
         const paypalContainer = document.getElementById('paypal-button-container');
+        const comprobanteContainer = document.getElementById('comprobante-pago-container');
         
         if (this.value === 'PayPal') {
             paypalContainer.style.display = 'block';
-            // Si el botón PayPal aún no está renderizado, lo inicializamos
+            comprobanteContainer.style.display = 'block'; 
+            
             if (paypalContainer.children.length === 0) {
                 initPayPalButton();
             }
         } else {
             paypalContainer.style.display = 'none';
+            comprobanteContainer.style.display = 'none';
         }
     });
 });
@@ -886,10 +919,9 @@ const payWithPaypalOption = document.getElementById('pay-with-paypal-option');
 let selectedOption = document.querySelector('.delivery-option:checked').value;
 const SHIPPING_COST = 5.00; // Definimos el costo de envío como constante
 
-// Modifica la función initPayPalButton
 function initPayPalButton() {
-       // Limpia el contenedor primero para evitar múltiples botones
-       document.getElementById('paypal-button-container').innerHTML = '';
+    // Limpia el contenedor primero para evitar múltiples botones
+    document.getElementById('paypal-button-container').innerHTML = '';
     const cart = getCart();
     
     let subtotal = 0;
@@ -897,7 +929,6 @@ function initPayPalButton() {
         subtotal += product.price * product.quantity;
     });
     
-    // Sumar siempre los 5 pesos de envío
     const shippingCost = 5.00;
     const total = subtotal + shippingCost;
     
@@ -913,21 +944,21 @@ function initPayPalButton() {
             return actions.order.create({
                 purchase_units: [{
                     amount: {
-                        value: total.toFixed(2), // Total incluyendo siempre el envío
+                        value: total.toFixed(2),
                         currency_code: "MXN",
                         breakdown: {
                             item_total: {
-                                value: subtotal.toFixed(2), // Valor de los productos
+                                value: subtotal.toFixed(2),
                                 currency_code: "MXN"
                             },
                             shipping: {
-                                value: shippingCost.toFixed(2), // Siempre 5 pesos de envío
+                                value: shippingCost.toFixed(2),
                                 currency_code: "MXN"
                             }
                         }
                     },
                     items: cart.map(item => ({
-                        name: item.name.substring(0, 127), // PayPal limita a 127 caracteres
+                        name: item.name.substring(0, 127),
                         unit_amount: {
                             value: item.price.toFixed(2),
                             currency_code: "MXN"
@@ -936,14 +967,21 @@ function initPayPalButton() {
                     }))
                 }],
                 application_context: {
-                    shipping_preference: 'NO_SHIPPING' // Indicamos que no hay envío físico
+                    shipping_preference: 'NO_SHIPPING'
                 }
             });
         },
         
         onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
+                // 1. Primero cerramos el sandbox de PayPal
+                const paypalContainer = document.getElementById('paypal-button-container');
+                paypalContainer.innerHTML = ''; // Esto elimina completamente el botón
+                
+                // 2. Marcamos PayPal como método de pago seleccionado
                 document.getElementById('paypal').checked = true;
+                
+                // 3. Configuramos los datos de PayPal en el formulario
                 const form = document.getElementById('formPedido');
                 
                 if (!document.getElementById('paypal_transaction_id')) {
@@ -964,16 +1002,129 @@ function initPayPalButton() {
                 
                 document.getElementById('paypal_transaction_id').value = details.id;
                 document.getElementById('paypal_payer_email').value = details.payer.email_address;
-                form.submit();        
-                localStorage.removeItem('shoppingCart');
-                const event = new Event('cartCleared');
-                window.dispatchEvent(event);
+                
+                // 4. Mostramos el campo para subir comprobante
+                document.getElementById('comprobante-pago-container').style.display = 'block';
+                
+                // 5. Mostramos mensaje al usuario (después de cerrar el sandbox)
+                setTimeout(() => {
+                    alert('Pago con PayPal completado. Ahora por favor sube una captura del comprobante.');
+                }, 100);
             });
         },
         
         onError: function(err) {
             console.error(err);
             alert('Ocurrió un error al procesar el pago con PayPal. Por favor intenta nuevamente.');
+        },
+        
+        onCancel: function(data) {
+            // Cuando el usuario cancela el pago
+            alert('Has cancelado el pago con PayPal. Puedes intentarlo nuevamente si lo deseas.');
+        }
+    }).render('#paypal-button-container');
+}function initPayPalButton() {
+    // Limpia el contenedor primero para evitar múltiples botones
+    document.getElementById('paypal-button-container').innerHTML = '';
+    const cart = getCart();
+    
+    let subtotal = 0;
+    cart.forEach(product => {
+        subtotal += product.price * product.quantity;
+    });
+    
+    const shippingCost = 5.00;
+    const total = subtotal + shippingCost;
+    
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+        },
+        
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: total.toFixed(2),
+                        currency_code: "MXN",
+                        breakdown: {
+                            item_total: {
+                                value: subtotal.toFixed(2),
+                                currency_code: "MXN"
+                            },
+                            shipping: {
+                                value: shippingCost.toFixed(2),
+                                currency_code: "MXN"
+                            }
+                        }
+                    },
+                    items: cart.map(item => ({
+                        name: item.name.substring(0, 127),
+                        unit_amount: {
+                            value: item.price.toFixed(2),
+                            currency_code: "MXN"
+                        },
+                        quantity: item.quantity.toString()
+                    }))
+                }],
+                application_context: {
+                    shipping_preference: 'NO_SHIPPING'
+                }
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // 1. Primero cerramos el sandbox de PayPal
+                const paypalContainer = document.getElementById('paypal-button-container');
+                paypalContainer.innerHTML = ''; // Esto elimina completamente el botón
+                
+                // 2. Marcamos PayPal como método de pago seleccionado
+                document.getElementById('paypal').checked = true;
+                
+                // 3. Configuramos los datos de PayPal en el formulario
+                const form = document.getElementById('formPedido');
+                
+                if (!document.getElementById('paypal_transaction_id')) {
+                    const transactionId = document.createElement('input');
+                    transactionId.type = 'hidden';
+                    transactionId.name = 'paypal_transaction_id';
+                    transactionId.id = 'paypal_transaction_id';
+                    form.appendChild(transactionId);
+                }
+                
+                if (!document.getElementById('paypal_payer_email')) {
+                    const payerEmail = document.createElement('input');
+                    payerEmail.type = 'hidden';
+                    payerEmail.name = 'paypal_payer_email';
+                    payerEmail.id = 'paypal_payer_email';
+                    form.appendChild(payerEmail);
+                }
+                
+                document.getElementById('paypal_transaction_id').value = details.id;
+                document.getElementById('paypal_payer_email').value = details.payer.email_address;
+                
+                // 4. Mostramos el campo para subir comprobante
+                document.getElementById('comprobante-pago-container').style.display = 'block';
+                
+                // 5. Mostramos mensaje al usuario (después de cerrar el sandbox)
+                setTimeout(() => {
+                    alert('Pago con PayPal completado. Ahora por favor sube una captura del comprobante.');
+                }, 100);
+            });
+        },
+        
+        onError: function(err) {
+            console.error(err);
+            alert('Ocurrió un error al procesar el pago con PayPal. Por favor intenta nuevamente.');
+        },
+        
+        onCancel: function(data) {
+            // Cuando el usuario cancela el pago
+            alert('Has cancelado el pago con PayPal. Puedes intentarlo nuevamente si lo deseas.');
         }
     }).render('#paypal-button-container');
 }
