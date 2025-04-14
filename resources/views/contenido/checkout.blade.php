@@ -913,7 +913,10 @@ function initPayPalButton() {
                 
                 document.getElementById('paypal_transaction_id').value = details.id;
                 document.getElementById('paypal_payer_email').value = details.payer.email_address;
-                form.submit();
+                form.submit();        
+                localStorage.removeItem('shoppingCart');
+                const event = new Event('cartCleared');
+                window.dispatchEvent(event);
             });
         },
         
