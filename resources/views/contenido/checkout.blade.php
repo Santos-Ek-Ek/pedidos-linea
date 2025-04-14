@@ -334,7 +334,7 @@
                                                         <label class="lead" for="cp">
                                                             <input id="cp" type="radio"
                                                                 name="metodo_pago" class="radio" value="Pagar al pasar a
-                                                            recoge">Pagar al pasar a
+                                                            recoger">Pagar al pasar a
                                                             recoger</label>
                                                     </li>
                                                     <li id="pay-with-paypal-option" style="display: none;">
@@ -347,7 +347,7 @@
         </li>
                                                 </ul>
                                             </div>
-                                            <button type="submit" class="cus-btn dark w-100">
+                                            <button type="submit" class="cus-btn dark w-100" id="submit-order-btn" disabled>
                                                 <span class="icon-wrapper">
                                                     <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20"
                                                         height="20" viewBox="0 0 20 20" fill="none">
@@ -367,6 +367,9 @@
                                                 </span>
                                                 Realizar pedido
                                             </button>
+                                            <div id="empty-cart-alert" class="alert alert-warning mt-3" style="display: none;">
+    Tu carrito está vacío. Agrega productos para continuar.
+</div>
                                         </div>
                                     </div>
                                 </div>
@@ -566,6 +569,7 @@
         if (cart.length === 0) {
             orderSummary.innerHTML = '<p class="text-center">No hay productos en el carrito</p>';
             orderTotalElement.textContent = '$0.00';
+            updateOrderButtonState();
             return;
         }
 
@@ -802,7 +806,21 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('sidebar-cart').classList.add('active');
         document.getElementById('sidebar-cart-curtain').classList.add('active');
     });
-
+   // Actualizar estado del botón al cargar la página
+   updateOrderButtonState();
+    
+    // Validar formulario antes de enviar
+    form.addEventListener('submit', validateFormBeforeSubmit);
+    
+    // Actualizar estado del botón cuando cambia el carrito
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart' || event.key === 'cart-cleared') {
+            const updatedCart = getCart();
+            renderOrderSummary(updatedCart, selectedOption);
+            updateProductosInput();
+            updateOrderButtonState(); // <- Añade esta línea
+        }
+    });
     // Configurar el botón de cerrar
     document.querySelector('.close-button').addEventListener('click', function(e) {
         e.preventDefault();
@@ -825,7 +843,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Actualizar el mini carrito al cargar la página
     updateMiniCart();
+
+
 });
+
+function updateOrderButtonState() {
+    const cart = getCart();
+    const submitBtn = document.getElementById('submit-order-btn');
+    const emptyCartAlert = document.getElementById('empty-cart-alert');
+    
+    if (cart.length === 0) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+        emptyCartAlert.style.display = 'block';
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('disabled');
+        emptyCartAlert.style.display = 'none';
+    }
+}
+
 
 // Modifica el event listener de los radios de método de pago
 document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
