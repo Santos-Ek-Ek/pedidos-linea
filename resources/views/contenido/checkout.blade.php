@@ -828,16 +828,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     // Configurar el botón de cerrar
-    document.querySelector('.close-button').addEventListener('click', function(e) {
+    document.querySelector('#sidebar-cart .close-button').addEventListener('click', function(e) {
         e.preventDefault();
-        document.getElementById('sidebar-cart').classList.remove('active');
-        document.getElementById('sidebar-cart-curtain').classList.remove('active');
+        toggleMiniCart(false);
     });
-
-    // Configurar la cortina de fondo
+    
+    // Cerrar al hacer clic en la cortina
     document.getElementById('sidebar-cart-curtain').addEventListener('click', function() {
-        document.getElementById('sidebar-cart').classList.remove('active');
-        this.classList.remove('active');
+        toggleMiniCart(false);
+    });
+    
+    // Cerrar al presionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            toggleMiniCart(false);
+        }
     });
 
     // Escuchar cambios en el localStorage
@@ -852,7 +857,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 });
+// Función para abrir/cerrar el mini carrito
+function toggleMiniCart(open = true) {
+    const cart = document.getElementById('sidebar-cart');
+    const curtain = document.getElementById('sidebar-cart-curtain');
+    
+    if (open) {
+        updateMiniCart(); // Actualizar contenido antes de mostrar
+        cart.classList.add('active');
+        curtain.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Evitar scroll del body
+    } else {
+        cart.classList.remove('active');
+        curtain.classList.remove('active');
+        document.body.style.overflow = ''; // Restaurar scroll
+    }
+}
 
+// Configurar event listeners para el mini carrito
+function setupMiniCartListeners() {
+    // Botón para abrir el carrito
+    document.querySelectorAll('.cart-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleMiniCart(true);
+        });
+    });
+    
+    // Botón para cerrar el carrito
+    document.querySelector('#sidebar-cart .close-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleMiniCart(false);
+    });
+    
+    // Cerrar al hacer clic en la cortina
+    document.getElementById('sidebar-cart-curtain').addEventListener('click', function() {
+        toggleMiniCart(false);
+    });
+    
+    // Cerrar al presionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            toggleMiniCart(false);
+        }
+    });
+}
+
+// En el DOMContentLoaded:
+document.addEventListener('DOMContentLoaded', function() {
+    setupMiniCartListeners();
+    updateMiniCart();
+    
+    // Resto de tu código de inicialización...
+});
 function updateOrderButtonState() {
     const cart = getCart();
     const submitBtn = document.getElementById('submit-order-btn');

@@ -394,7 +394,6 @@ function clearCart() {
     window.dispatchEvent(event);
 }
 
-// Función para actualizar la vista del minicarrito
 function updateMiniCartView() {
     const cart = getCart();
     const cartItemsContainer = document.getElementById('cart-items');
@@ -531,7 +530,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Función para renderizar los productos en la tabla (versión desktop)
 function renderCartItems() {
     const cart = getCart();
     const cartTableBody = document.getElementById('cart-table-body');
@@ -581,8 +579,9 @@ function renderCartItems() {
                     <div class="decrement" onclick="updateQuantity(${index}, -1)">
                         <i class="fa-solid fa-dash"></i>
                     </div>
-                    <input type="text" name="quantity" value="${product.quantity}" 
-                           maxlength="2" size="1" class="number" id="qty-${index}">
+                    <input type="number" name="quantity" value="${product.quantity}" 
+                           min="1" max="${product.maxQuantity}" class="number" id="qty-${index}"
+                           onchange="validateQuantity(${index}, this)">
                     <div class="increment" onclick="updateQuantity(${index}, 1)">
                         <i class="fa-solid fa-plus-large"></i>
                     </div>
@@ -619,8 +618,9 @@ function renderCartItems() {
                         <div class="decrement" onclick="updateQuantity(${index}, -1)">
                             <i class="fa-solid fa-dash"></i>
                         </div>
-                        <input type="text" name="quantity" value="${product.quantity}" 
-                               maxlength="2" size="1" class="number" id="mobile-qty-${index}">
+                        <input type="number" name="quantity" value="${product.quantity}" 
+                               min="1" max="${product.maxQuantity}" class="number" id="mobile-qty-${index}"
+                               onchange="validateQuantity(${index}, this)">
                         <div class="increment" onclick="updateQuantity(${index}, 1)">
                             <i class="fa-solid fa-plus-large"></i>
                         </div>
@@ -636,6 +636,45 @@ function renderCartItems() {
     });
     
     updateTotals();
+}
+
+// Función para validar la cantidad ingresada manualmente
+function validateQuantity(index, input) {
+    const cart = getCart();
+    const value = parseInt(input.value);
+    const max = parseInt(input.max);
+    
+    if (isNaN(value)) {
+        input.value = 1;
+    } else if (value < 1) {
+        input.value = 1;
+    } else if (value > max) {
+        input.value = max;
+        showToast(`No puedes pedir más de ${max} unidades de este producto.`, true);
+    }
+    
+    cart[index].quantity = parseInt(input.value);
+    saveCart(cart);
+    updateTotals();
+}
+
+// Función para actualizar la cantidad (disponible globalmente)
+function updateQuantity(index, change) {
+    const cart = getCart();
+    const newQuantity = cart[index].quantity + change;
+    const maxQuantity = cart[index].maxQuantity;
+    
+    if (newQuantity < 1) return;
+    
+    if (newQuantity > maxQuantity) {
+        showToast(`No puedes pedir más de ${maxQuantity} unidades de este producto.`, true);
+        return;
+    }
+    
+    cart[index].quantity = newQuantity;
+    saveCart(cart);
+    renderCartItems();
+    updateMiniCartView();
 }
 
 function updateTotals() {
@@ -654,17 +693,7 @@ function updateTotals() {
     document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
 }
 
-// Función para actualizar la cantidad (disponible globalmente)
-function updateQuantity(index, change) {
-    const cart = getCart();
-    const newQuantity = cart[index].quantity + change;
-    if (newQuantity < 1) return;
-    
-    cart[index].quantity = newQuantity;
-    saveCart(cart);
-    renderCartItems();
-    updateMiniCartView();
-}
+
 
 // Función para eliminar producto del carrito (disponible globalmente)
 function removeFromCartPage(index) {
