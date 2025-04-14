@@ -219,7 +219,7 @@
                     <!-- Cart Star -->
                     <section class="pt-80 pb-40">
                         <div class="container-fluid">
-                        <form id="formPedido" action="{{ route('pedidos.store') }}"method="POST">
+                        <form id="formPedido" action="{{ route('pedidos.store') }}"method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="productos" id="productos-carrito">
 
@@ -347,7 +347,8 @@
     <!-- Contenedor para el comprobante de pago -->
     <div id="comprobante-pago-container" style="display: none; margin-top: 15px;">
         <label for="comprobante-pago">Subir captura de comprobante de pago</label>
-        <input type="file" name="comprobante_pago" id="comprobante-pago" accept="image/*,.pdf">
+        <input type="file" name="comprobante_pago" id="comprobante-pago" accept="image/*,.pdf" required>
+        <small class="text-muted">Por favor sube una imagen o PDF del comprobante de pago de PayPal</small>
     </div>
         </li>
                                                 </ul>
@@ -880,10 +881,22 @@ function validateFormBeforeSubmit(e) {
     }
     
     // Validar comprobante solo si el método es PayPal
-    if (metodoPago === 'PayPal' && comprobanteInput.files.length === 0) {
-        e.preventDefault();
-        alert('Por favor sube una captura del comprobante de pago de PayPal');
-        return false;
+    if (metodoPago === 'PayPal') {
+        if (comprobanteInput.files.length === 0) {
+            e.preventDefault();
+            alert('Por favor sube una captura del comprobante de pago de PayPal');
+            comprobanteInput.focus();
+            return false;
+        }
+        
+        // Validar tipo de archivo
+        const file = comprobanteInput.files[0];
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+        if (!validTypes.includes(file.type)) {
+            e.preventDefault();
+            alert('Por favor sube una imagen (JPEG, PNG, GIF) o PDF como comprobante');
+            return false;
+        }
     }
     
     // Si todo está bien, proceder con el envío
@@ -903,13 +916,14 @@ document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
         if (this.value === 'PayPal') {
             paypalContainer.style.display = 'block';
             comprobanteContainer.style.display = 'block'; 
-            
+            document.getElementById('comprobante-pago').required = true;
             if (paypalContainer.children.length === 0) {
                 initPayPalButton();
             }
         } else {
             paypalContainer.style.display = 'none';
             comprobanteContainer.style.display = 'none';
+            document.getElementById('comprobante-pago').required = false;
         }
     });
 });
@@ -1004,7 +1018,9 @@ function initPayPalButton() {
                 document.getElementById('paypal_payer_email').value = details.payer.email_address;
                 
                 // 4. Mostramos el campo para subir comprobante
-                document.getElementById('comprobante-pago-container').style.display = 'block';
+                const comprobanteContainer = document.getElementById('comprobante-pago-container');
+                comprobanteContainer.style.display = 'block';
+                document.getElementById('comprobante-pago').required = true;
                 
                 // 5. Mostramos mensaje al usuario (después de cerrar el sandbox)
                 setTimeout(() => {

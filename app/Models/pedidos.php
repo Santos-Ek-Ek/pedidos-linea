@@ -20,7 +20,8 @@ class pedidos extends Model
         'metodo_pago',
         'estado',
         'cantidad',
-        'ticket_path'
+        'ticket_path',
+        'comprobante_paypal'
     ];
     
     public function producto()

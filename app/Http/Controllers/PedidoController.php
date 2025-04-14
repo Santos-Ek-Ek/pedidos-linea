@@ -26,7 +26,8 @@ class PedidoController extends Controller
             'pickup_time' => 'nullable|required_if:delivery_option,Pasar a recoger',
             'delivery_time' => 'nullable|required_if:delivery_option,Enviar a domicilio',
             'productos' => 'required|json',
-            'telefono' => 'required'
+            'telefono' => 'required',
+            'comprobante_pago' => 'required_if:metodo_pago,PayPal|file|mimes:jpg,jpeg,png,gif,pdf|max:2048'
         ]);
     
         $productos = json_decode($request->productos, true);
@@ -55,6 +56,22 @@ class PedidoController extends Controller
         // Generar nombre único para el ticket
         $filename = 'pedido_'.$cliente->id.'_'.now()->format('YmdHis').'.pdf';
         $ticketPath = 'tickets/'.$filename;
+
+        $pagoPath =null;
+        if ($request->metodo_pago === 'PayPal' && $request->hasFile('comprobante_pago')) {
+            $comprobante = $request->file('comprobante_pago');
+            $extension = $comprobante->getClientOriginalExtension();
+            $nombreComprobante = 'pago_'.$cliente->id.'_'.now()->format('YmdHis').'.'.$extension;
+            $pagoPath = 'pagos/'.$nombreComprobante;
+            
+            // Crear directorio si no existe
+            if (!File::exists(public_path('pagos'))) {
+                File::makeDirectory(public_path('pagos'), 0755, true);
+            }
+            
+            // Guardar el archivo con la extensión original
+            $comprobante->move(public_path('pagos'), $nombreComprobante);
+        }
     
         // Crear pedidos
         $pedidosData = [];
@@ -78,7 +95,9 @@ class PedidoController extends Controller
                     : $request->input('delivery_time'),
                 'total' => $producto['price'] * $producto['quantity'],
                 'estado' => 'Pendiente',
-                'ticket_path' => $ticketPath // Ruta relativa desde public/
+                'ticket_path' => $ticketPath, // Ruta relativa desde public/
+                'comprobante_paypal' => $pagoPath,
+
             ]);
             
             $pedidosData[] = $pedido;
@@ -132,6 +151,22 @@ class PedidoController extends Controller
             'Content-Disposition' => 'inline; filename="ticket_pedido.pdf"'
         ]);
     }
+
+    public function showComprobante($filename)
+{
+    $path = public_path('pagos/'.$filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    $mime = mime_content_type($path);
+    
+    return response()->file($path, [
+        'Content-Type' => $mime,
+        'Content-Disposition' => 'inline; filename="comprobante_pago.'.pathinfo($path, PATHINFO_EXTENSION).'"'
+    ]);
+}
 
     public function updateStatus(Request $request, $id)
 {

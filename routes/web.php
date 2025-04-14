@@ -100,3 +100,7 @@ Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
      ->name('pedidos.updateStatus');
 
      Route::get('/misCompras', [comprasController::class, 'misPedidos']);
+
+
+     Route::get('/ComprobanteVer/{filename}', [PedidoController::class, 'showComprobante'])
+     ->name('comprobante.show');

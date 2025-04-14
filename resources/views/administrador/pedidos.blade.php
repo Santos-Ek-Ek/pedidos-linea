@@ -68,7 +68,20 @@
 </td>
                       <td>  <div style="max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{$pedido->metodo_entrega}}</div></td>
                       <td>{{$pedido->horario_entrega}}</td>
-                      <td>  <div style="max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{$pedido->metodo_pago}}</div></td>
+                      <td>  <div style="max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{$pedido->metodo_pago}}
+                      @if($pedido->metodo_pago === "PayPal")
+        @if($pedido->comprobante_paypal)
+            <a href="{{ asset($pedido->comprobante_paypal) }}" 
+               target="_blank" 
+               class="ticket-link"
+               title="Ver comprobante">
+                Ver
+            </a>
+        @else
+            <span class="text-muted">No generado</span>
+        @endif
+    @endif
+                      </div></td>
                       <td>${{ number_format($pedido->total + ($pedido->metodo_entrega == 'Enviar a domicilio' ? 5 : 0), 2) }}</td>
                       <td>{{$pedido->estado}}
                       @if($pedido->ticket_path)
