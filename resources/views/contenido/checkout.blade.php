@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="assets/css/vendor/slick-theme.css">
     <link rel="stylesheet" href="assets/css/vendor/nice-select.css">
     <link rel="stylesheet" href="assets/css/app.css">
+    <!-- Agrega esto en el <head> -->
+<script src="https://www.paypal.com/sdk/js?client-id=AVAt47QcJ_q4C4QDNJF_piNHpOkJARyU_sUS6nf8aeZb5yU_pGRXR18gaVKyRYyIn1AcSPMj7rLbOhY1&currency=MXN"></script>
 
 </head>
 
@@ -335,6 +337,14 @@
                                                             recoge">Pagar al pasar a
                                                             recoger</label>
                                                     </li>
+                                                    <li id="pay-with-paypal-option" style="display: none;">
+            <label class="lead" for="paypal">
+                <input id="paypal" type="radio" name="metodo_pago" class="radio" value="PayPal">
+                Pagar con PayPal
+            </label>
+            <!-- Contenedor para el botón de PayPal -->
+            <div id="paypal-button-container" style="margin-top: 15px;"></div>
+        </li>
                                                 </ul>
                                             </div>
                                             <button type="submit" class="cus-btn dark w-100">
@@ -580,19 +590,23 @@
     }
 
     // Configurar el estado inicial
-    if (selectedOption === 'Pasar a recoger') {
-        pickupTimeContainer.style.display = 'block';
-        deliveryTimeContainer.style.display = 'none';
-        payOnDeliveryOption.style.display = 'none';
-        payOnPickupOption.style.display = 'block';
-        document.getElementById('cp').checked = true;
-    } else {
-        deliveryTimeContainer.style.display = 'block';
-        pickupTimeContainer.style.display = 'none';
-        payOnDeliveryOption.style.display = 'block';
-        payOnPickupOption.style.display = 'none';
-        document.getElementById('cod').checked = true;
-    }
+// Configurar el estado inicial
+if (selectedOption === 'Pasar a recoger') {
+    pickupTimeContainer.style.display = 'block';
+    deliveryTimeContainer.style.display = 'none';
+    payOnDeliveryOption.style.display = 'none';
+    payWithPaypalOption.style.display = 'none';
+    payOnPickupOption.style.display = 'block';
+    document.getElementById('cp').checked = true;
+} else {
+    deliveryTimeContainer.style.display = 'block';
+    pickupTimeContainer.style.display = 'none';
+    payOnDeliveryOption.style.display = 'block';
+    payWithPaypalOption.style.display = 'block';
+    payOnPickupOption.style.display = 'none';
+    document.getElementById('cod').checked = true;
+    initPayPalButton();
+}
 
     // Mostrar carrito inicial
     const cart = getCart();
@@ -601,26 +615,34 @@
 
     // Manejar cambios en las opciones de entrega
     deliveryOptions.forEach(option => {
-        option.addEventListener('change', function() {
-            selectedOption = this.value;
-            const cart = getCart();
-            renderOrderSummary(cart, selectedOption);
+    option.addEventListener('change', function() {
+        selectedOption = this.value;
+        const cart = getCart();
+        renderOrderSummary(cart, selectedOption);
+        
+        if (this.value === 'Pasar a recoger') {
+            pickupTimeContainer.style.display = 'block';
+            deliveryTimeContainer.style.display = 'none';
+            payOnDeliveryOption.style.display = 'none';
+            payWithPaypalOption.style.display = 'none';
+            payOnPickupOption.style.display = 'block';
+            document.getElementById('cp').checked = true;
             
-            if (this.value === 'Pasar a recoger') {
-                pickupTimeContainer.style.display = 'block';
-                deliveryTimeContainer.style.display = 'none';
-                payOnDeliveryOption.style.display = 'none';
-                payOnPickupOption.style.display = 'block';
-                document.getElementById('cp').checked = true;
-            } else if (this.value === 'Enviar a domicilio') {
-                deliveryTimeContainer.style.display = 'block';
-                pickupTimeContainer.style.display = 'none';
-                payOnDeliveryOption.style.display = 'block';
-                payOnPickupOption.style.display = 'none';
-                document.getElementById('cod').checked = true;
-            }
-        });
+            // Limpiar el botón de PayPal si existe
+            document.getElementById('paypal-button-container').innerHTML = '';
+        } else if (this.value === 'Enviar a domicilio') {
+            deliveryTimeContainer.style.display = 'block';
+            pickupTimeContainer.style.display = 'none';
+            payOnDeliveryOption.style.display = 'block';
+            payWithPaypalOption.style.display = 'block';
+            payOnPickupOption.style.display = 'none';
+            document.getElementById('cod').checked = true;
+            
+            // Inicializar el botón de PayPal
+            initPayPalButton();
+        }
     });
+});
 
     // Manejar envío del formulario
     form.addEventListener('submit', function(e) {
@@ -808,7 +830,137 @@ document.addEventListener('DOMContentLoaded', function() {
     // Actualizar el mini carrito al cargar la página
     updateMiniCart();
 });
+
+
+// En tu evento DOMContentLoaded, agrega estas definiciones al inicio:
+const payWithPaypalOption = document.getElementById('pay-with-paypal-option');
+let selectedOption = document.querySelector('.delivery-option:checked').value;
+const SHIPPING_COST = 5.00; // Definimos el costo de envío como constante
+
+// Modifica la función initPayPalButton
+function initPayPalButton() {
+    const cart = getCart();
+    
+    let subtotal = 0;
+    cart.forEach(product => {
+        subtotal += product.price * product.quantity;
+    });
+    
+    // Sumar siempre los 5 pesos de envío
+    const shippingCost = 5.00;
+    const total = subtotal + shippingCost;
+    
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+        },
+        
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: total.toFixed(2), // Total incluyendo siempre el envío
+                        currency_code: "MXN",
+                        breakdown: {
+                            item_total: {
+                                value: subtotal.toFixed(2), // Valor de los productos
+                                currency_code: "MXN"
+                            },
+                            shipping: {
+                                value: shippingCost.toFixed(2), // Siempre 5 pesos de envío
+                                currency_code: "MXN"
+                            }
+                        }
+                    },
+                    items: cart.map(item => ({
+                        name: item.name.substring(0, 127), // PayPal limita a 127 caracteres
+                        unit_amount: {
+                            value: item.price.toFixed(2),
+                            currency_code: "MXN"
+                        },
+                        quantity: item.quantity.toString()
+                    }))
+                }],
+                application_context: {
+                    shipping_preference: 'NO_SHIPPING' // Indicamos que no hay envío físico
+                }
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                document.getElementById('paypal').checked = true;
+                const form = document.getElementById('formPedido');
+                
+                if (!document.getElementById('paypal_transaction_id')) {
+                    const transactionId = document.createElement('input');
+                    transactionId.type = 'hidden';
+                    transactionId.name = 'paypal_transaction_id';
+                    transactionId.id = 'paypal_transaction_id';
+                    form.appendChild(transactionId);
+                }
+                
+                if (!document.getElementById('paypal_payer_email')) {
+                    const payerEmail = document.createElement('input');
+                    payerEmail.type = 'hidden';
+                    payerEmail.name = 'paypal_payer_email';
+                    payerEmail.id = 'paypal_payer_email';
+                    form.appendChild(payerEmail);
+                }
+                
+                document.getElementById('paypal_transaction_id').value = details.id;
+                document.getElementById('paypal_payer_email').value = details.payer.email_address;
+                form.submit();
+            });
+        },
+        
+        onError: function(err) {
+            console.error(err);
+            alert('Ocurrió un error al procesar el pago con PayPal. Por favor intenta nuevamente.');
+        }
+    }).render('#paypal-button-container');
+}
+
+// Y actualiza las llamadas a initPayPalButton para pasar el parámetro:
+if (selectedOption === 'Enviar a domicilio') {
+    initPayPalButton(selectedOption);
+}
+
+// Y en el event listener de cambio:
+option.addEventListener('change', function() {
+    selectedOption = this.value;
+    // ... resto del código ...
+    if (this.value === 'Enviar a domicilio') {
+        initPayPalButton(selectedOption);
+    }
+});
+
+// Inicializar el botón de PayPal cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo inicializar PayPal si hay productos en el carrito
+    const cart = getCart();
+    if (cart.length > 0) {
+        initPayPalButton();
+    }
+    
+    // Actualizar cuando cambie el carrito
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            const cart = getCart();
+            if (cart.length > 0) {
+                // Limpiar y recrear el botón de PayPal
+                document.getElementById('paypal-button-container').innerHTML = '';
+                initPayPalButton();
+            }
+        }
+    });
+});
 </script>
+
+
 <style>
 /* Estilos para el mini carrito */
 #sidebar-cart {
