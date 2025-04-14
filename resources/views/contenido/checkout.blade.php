@@ -343,7 +343,7 @@
                 Pagar con PayPal
             </label>
             <!-- Contenedor para el botón de PayPal -->
-            <div id="paypal-button-container" style="margin-top: 15px;"></div>
+            <div id="paypal-button-container" style="display: none;margin-top: 15px;"></div>
         </li>
                                                 </ul>
                                             </div>
@@ -613,8 +613,8 @@ if (selectedOption === 'Pasar a recoger') {
     renderOrderSummary(cart, selectedOption);
     updateProductosInput();
 
-    // Manejar cambios en las opciones de entrega
-    deliveryOptions.forEach(option => {
+   // En el event listener de las opciones de entrega
+deliveryOptions.forEach(option => {
     option.addEventListener('change', function() {
         selectedOption = this.value;
         const cart = getCart();
@@ -627,9 +627,7 @@ if (selectedOption === 'Pasar a recoger') {
             payWithPaypalOption.style.display = 'none';
             payOnPickupOption.style.display = 'block';
             document.getElementById('cp').checked = true;
-            
-            // Limpiar el botón de PayPal si existe
-            document.getElementById('paypal-button-container').innerHTML = '';
+            document.getElementById('paypal-button-container').style.display = 'none';
         } else if (this.value === 'Enviar a domicilio') {
             deliveryTimeContainer.style.display = 'block';
             pickupTimeContainer.style.display = 'none';
@@ -637,9 +635,7 @@ if (selectedOption === 'Pasar a recoger') {
             payWithPaypalOption.style.display = 'block';
             payOnPickupOption.style.display = 'none';
             document.getElementById('cod').checked = true;
-            
-            // Inicializar el botón de PayPal
-            initPayPalButton();
+            document.getElementById('paypal-button-container').style.display = 'none';
         }
     });
 });
@@ -831,6 +827,22 @@ document.addEventListener('DOMContentLoaded', function() {
     updateMiniCart();
 });
 
+// Modifica el event listener de los radios de método de pago
+document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const paypalContainer = document.getElementById('paypal-button-container');
+        
+        if (this.value === 'PayPal') {
+            paypalContainer.style.display = 'block';
+            // Si el botón PayPal aún no está renderizado, lo inicializamos
+            if (paypalContainer.children.length === 0) {
+                initPayPalButton();
+            }
+        } else {
+            paypalContainer.style.display = 'none';
+        }
+    });
+});
 
 // En tu evento DOMContentLoaded, agrega estas definiciones al inicio:
 const payWithPaypalOption = document.getElementById('pay-with-paypal-option');
@@ -839,6 +851,8 @@ const SHIPPING_COST = 5.00; // Definimos el costo de envío como constante
 
 // Modifica la función initPayPalButton
 function initPayPalButton() {
+       // Limpia el contenedor primero para evitar múltiples botones
+       document.getElementById('paypal-button-container').innerHTML = '';
     const cart = getCart();
     
     let subtotal = 0;
