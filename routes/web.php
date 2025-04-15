@@ -43,13 +43,13 @@ Route::get('/contactanos', function () {
     return view('contenido.contactanos');
 });
 
-Route::get('/miCuenta', function () {
-    return view('contenido.miCuenta');
-});
+
 
 
 Route::middleware(['auth'])->group(function () {
-
+    Route::get('/miCuenta', function () {
+        return view('contenido.miCuenta');
+    });
     Route::post('/actualizar-perfil', [authController::class, 'actualizarPerfil'])->name('actualizar.perfil');
     Route::get('/obtener-datos-usuario', function() {
         return response()->json([
