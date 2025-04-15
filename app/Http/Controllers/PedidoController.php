@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class PedidoController extends Controller
 {
@@ -27,8 +28,13 @@ class PedidoController extends Controller
             'delivery_time' => 'nullable|required_if:delivery_option,Enviar a domicilio',
             'productos' => 'required|json',
             'telefono' => 'required',
-            'comprobante_pago' => 'required_if:metodo_pago,PayPal|file|mimes:jpg,jpeg,png,gif,pdf|max:2048'
         ]);
+                // Validación condicional para PayPal
+                if ($request->metodo_pago === 'PayPal') {
+                    $request->validate([
+                        'comprobante_pago' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+                    ]);
+                }
     
         $productos = json_decode($request->productos, true);
         $cliente = Auth::user();
@@ -57,20 +63,17 @@ class PedidoController extends Controller
         $filename = 'pedido_'.$cliente->id.'_'.now()->format('YmdHis').'.pdf';
         $ticketPath = 'tickets/'.$filename;
 
-        $pagoPath =null;
+        // Manejo del comprobante de pago para PayPal
+        $pagoPath = null;
+        $numeroComprobante = null;
+        
         if ($request->metodo_pago === 'PayPal' && $request->hasFile('comprobante_pago')) {
-            $comprobante = $request->file('comprobante_pago');
-            $extension = $comprobante->getClientOriginalExtension();
-            $nombreComprobante = 'pago_'.$cliente->id.'_'.now()->format('YmdHis').'.'.$extension;
-            $pagoPath = 'pagos/'.$nombreComprobante;
+            // Generar número de comprobante único (ejemplo: PYP-12345678)
+            $numeroComprobante = 'PYP-' . strtoupper(Str::random(8));
             
-            // Crear directorio si no existe
-            if (!File::exists(public_path('pagos'))) {
-                File::makeDirectory(public_path('pagos'), 0755, true);
-            }
-            
-            // Guardar el archivo con la extensión original
-            $comprobante->move(public_path('pagos'), $nombreComprobante);
+            $file = $request->file('comprobante_pago');
+            $filename = 'comprobante_'.$numeroComprobante.'.'.$file->getClientOriginalExtension();
+            $pagoPath = $file->storeAs('pagos', $filename, 'public');
         }
     
         // Crear pedidos

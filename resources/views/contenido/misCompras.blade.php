@@ -259,6 +259,13 @@
            title="Ver ticket">
             <i class="fas fa-file-pdf"></i> Ver
         </a>
+        @if(strtolower($pedido->metodo_pago) == 'paypal')
+                            <button class="btn btn-sm btn-primary update-comprobante" 
+                                    data-pedido-id="{{ $pedido->id }}"
+                                    title="Actualizar comprobante">
+                                <i class="fas fa-upload"></i> Actualizar Comprobante de pago
+                            </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -346,6 +353,32 @@
         <div id="sidebar-cart-curtain"></div>
         <!-- Mini Cart End -->
 
+<!-- Modal para actualizar comprobante -->
+<div class="modal fade" id="updateComprobanteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Actualizar comprobante de pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="updateComprobanteForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <input type="hidden" name="pedido_id" id="pedido_id">
+                    <div class="mb-3">
+                        <label for="comprobante" class="form-label">Seleccione el nuevo comprobante</label>
+                        <input class="form-control" type="file" id="comprobante" name="comprobante" required accept="image/*,.pdf">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
         <!-- Jquery Js -->
         <script src="assets/js/vendor/jquery-3.6.3.min.js"></script>
         <script src="assets/js/vendor/bootstrap.min.js"></script>
@@ -359,6 +392,37 @@
         <script src="assets/js/vendor/jquery.nice-select.min.js"></script>
         <script src="assets/js/vendor/slick.min.js"></script>
         <script src="assets/js/app.js"></script>
+
+        <script>
+$(document).ready(function() {
+    $('.update-comprobante').click(function() {
+        var pedidoId = $(this).data('pedido-id');
+        $('#pedido_id').val(pedidoId);
+        $('#updateComprobanteModal').modal('show');
+    });
+    
+    $('#updateComprobanteForm').submit(function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        
+        $.ajax({
+            url: '/actualizar-comprobante', // Ajusta esta ruta según tu backend
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#updateComprobanteModal').modal('hide');
+                alert('Comprobante actualizado correctamente');
+                location.reload(); // Recarga la página para ver los cambios
+            },
+            error: function(xhr) {
+                alert('Error al actualizar el comprobante: ' + xhr.responseText);
+            }
+        });
+    });
+});
+</script>
         <script>
 // Carrito como array de objetos
 let cart = [];

@@ -347,7 +347,7 @@
     <!-- Contenedor para el comprobante de pago -->
     <div id="comprobante-pago-container" style="display: none; margin-top: 15px;">
         <label for="comprobante-pago">Subir captura de comprobante de pago</label>
-        <input type="file" name="comprobante_pago" id="comprobante-pago" accept="image/*,.pdf" required>
+        <input type="file" name="comprobante_pago" id="comprobante-pago" accept="image/*,.pdf">
         <small class="text-muted">Por favor sube una imagen o PDF del comprobante de pago de PayPal</small>
     </div>
         </li>
@@ -508,6 +508,8 @@
 
     // Obtener elementos del DOM
     const form = document.getElementById('formPedido');
+      const payWithPaypalOption = document.getElementById('pay-with-paypal-option');
+
     const productosInput = document.getElementById('productos-carrito');
     const orderSummary = document.getElementById('order-summary');
     const orderTotalElement = document.getElementById('order-total');
@@ -816,7 +818,6 @@ document.addEventListener('DOMContentLoaded', function() {
    updateOrderButtonState();
     
     // Validar formulario antes de enviar
-    form.addEventListener('submit', validateFormBeforeSubmit);
     
     // Actualizar estado del botón cuando cambia el carrito
     window.addEventListener('storage', function(event) {
@@ -964,7 +965,7 @@ function validateFormBeforeSubmit(e) {
     return true;
 }
 
-// Modifica el event listener de los radios de método de pago
+// Configurar listeners para métodos de pago
 document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
     radio.addEventListener('change', function() {
         const paypalContainer = document.getElementById('paypal-button-container');
@@ -972,7 +973,7 @@ document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
         
         if (this.value === 'PayPal') {
             paypalContainer.style.display = 'block';
-            comprobanteContainer.style.display = 'block'; 
+            comprobanteContainer.style.display = 'block';
             document.getElementById('comprobante-pago').required = true;
             if (paypalContainer.children.length === 0) {
                 initPayPalButton();
@@ -984,6 +985,9 @@ document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
         }
     });
 });
+
+// Listener para el formulario
+form.addEventListener('submit', validateFormBeforeSubmit);
 
 // En tu evento DOMContentLoaded, agrega estas definiciones al inicio:
 const payWithPaypalOption = document.getElementById('pay-with-paypal-option');
