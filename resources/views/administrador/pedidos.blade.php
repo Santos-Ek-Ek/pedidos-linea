@@ -54,7 +54,7 @@
 
                     <tr>
                       <td hidden>{{ $pedido->id }}</td>
-                      <td><img width="100" height="100" src="{{ $pedido->producto->imagen }}" alt=""></td>
+                      <td><img width="100" height="100" src="../{{ $pedido->producto->imagen }}" alt=""></td>
                       <td>{{ $pedido->producto->nombre }}</td>
                       <td>  <div style="max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{ $pedido->notas }}</div></td>
                       <td>{{$pedido->cantidad}}</td>

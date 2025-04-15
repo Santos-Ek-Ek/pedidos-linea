@@ -84,7 +84,7 @@
                 @foreach($productos as $items)
                     <tr>
                       <th hidden>{{$items->id}}</th>
-                      <td><img width="100" height="100" src="{{$items->imagen}}" alt=""></td>
+                      <td><img width="100" height="100" src="../{{$items->imagen}}" alt=""></td>
                       <td>{{$items->nombre}}</td>
                       <td><p style="display: inline-block; max-width: 20rem; max-height: 7.8rem; overflow: auto; white-space: normal; word-wrap: break-word;">{{$items->detalle}}</p></td>
                       <td>{{$items->categoria->nombre}}</td>
