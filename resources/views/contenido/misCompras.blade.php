@@ -181,6 +181,8 @@
             <i class="fa-regular fa-user"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="miCuenta">Mi Cuenta</a></li>
+            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="misCompras">Mis Compras</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>

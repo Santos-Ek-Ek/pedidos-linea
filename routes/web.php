@@ -7,6 +7,7 @@ use App\Http\Controllers\administracionController;
 use App\Http\Controllers\comprasController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ventaProductoController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,23 @@ Route::get('/checkout', function () {
 
 Route::get('/contactanos', function () {
     return view('contenido.contactanos');
+});
+
+Route::get('/miCuenta', function () {
+    return view('contenido.miCuenta');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::post('/actualizar-perfil', [authController::class, 'actualizarPerfil'])->name('actualizar.perfil');
+    Route::get('/obtener-datos-usuario', function() {
+        return response()->json([
+            'success' => true,
+            'user' => Auth::user()
+        ]);
+    });
+    Route::post('/cambiar-contrasena', [authController::class, 'cambiarContrasena'])->name('cambiar.contrasena');
 });
 
 Route::post('/guardar-pedido', [PedidoController::class, 'store'])

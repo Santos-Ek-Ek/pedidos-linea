@@ -95,4 +95,73 @@ class AuthController extends Controller
     
             return redirect()->route('loginUser')->with('success', 'Logged out successfully!');
         }
+
+// app/Http/Controllers/UserController.php
+public function actualizarPerfil(Request $request)
+{
+    $user = Auth::user();
+    
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+    ]);
+
+    try {
+        $user->update([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'telefono' => $request->phone ?? null,
+            'direccion' => $request->address ?? null,
+            'referencia_envio' => $request->reference ?? null
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Perfil actualizado correctamente',
+            'user' => $user
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al actualizar el perfil: '.$e->getMessage()
+        ], 500);
+    }
+}
+
+// app/Http/Controllers/UserController.php
+public function cambiarContrasena(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required|string',
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $user = Auth::user();
+
+    // Verificar contraseña actual
+    if (!Hash::check($request->current_password, $user->password)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'La contraseña actual es incorrecta'
+        ], 422);
+    }
+
+    try {
+        // Actualizar contraseña
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contraseña cambiada exitosamente'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al cambiar la contraseña: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

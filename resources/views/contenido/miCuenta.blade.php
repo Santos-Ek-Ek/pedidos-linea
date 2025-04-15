@@ -24,7 +24,169 @@
         <link rel="stylesheet" href="assets/css/app.css">
         
     </head>
-
+    <style>
+        .account-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 15px;
+        }
+        
+        .account-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .account-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .account-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            overflow: hidden;
+        }
+        
+        .account-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .account-title {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .account-subtitle {
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .account-section {
+            margin-bottom: 30px;
+        }
+        
+        .account-section-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .account-info-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .account-info-label {
+            width: 150px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .account-info-value {
+            flex: 1;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn-edit {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+        }
+        
+        .btn-edit:hover {
+            text-decoration: underline;
+        }
+        
+        .account-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .account-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .account-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .account-info-item {
+                flex-direction: column;
+            }
+            
+            .account-info-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .order-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .order-details {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
     <body id="body">
         <!-- Preloader -->
         <div id="preloader">
@@ -206,162 +368,81 @@
                         <!-- Header End -->
 
                         <!-- Page Title Banner Start -->
-                        <h2 class="page-title">Productos</h2>
+                        <h2 class="page-title">Mi Cuenta</h2>
                         <!-- Page Title Banner End -->
                     </section>
                     <!-- Hero Section End -->  
 
                     <!-- Start Page Content -->
                     <div class="page-content">  
-                    @if(session('ticket'))
-    <div class="alert alert-success">
-        Pedido realizado con éxito. 
-        <a href="{{ route('tickets.download', session('ticket')) }}" target="_blank">
-            Descargar comprobante
-        </a>
-    </div>
-@endif
-                        <!-- Shop Section Start -->    
-                        <section class="py-80">
-                            <div class="container-fluid">
-                                <div class="row">
-                                    <div class="col-xl-3">
-                                        <div class="sidebar mb-48 mb-xl-0">
-                                            <h4 class="mb-48">Filtros</h4>
-                                            <div class="sidebar-widget pt-0">
-                                                <div class="search-field">
-                                                    <div class="form-group">
-                                                        <label>Buscar</label>
-                                                        <input type="search" class="cus-form-control" id="searchInput" name="search" autocomplete="off" required placeholder="Search here...">
-                                                    </div>
-                                                    <button type="submit" class="search-btn"><i class="fa-light fa-magnifying-glass"></i></button>
-                                                </div>
-                                            </div> 
-                                            <div class="sidebar-widget">
-    <div class="widget-title-row mb-24">
-        <h5>Rango de precios</h5>
-        <span><i class="fa-light fa-horizontal-rule"></i></span>
-    </div>
-    <div class="widget-content-block">
-        <div class="price-control-row mb-24">
-            <div class="price-control">
-                <label>Mínimo</label>
-                <input type="number" class="js-input-from" value="0" min="0" id="price-min">
-            </div>
-            <div class="price-control">
-                <label>Máximo</label>
-                <input type="number" class="js-input-to" value="0" min="0" id="price-max">
-            </div>
-        </div>
-        <button id="apply-filter" class="cus-btn primary">
-            <span class="icon-wrapper">
-                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </span>
-            Aplicar Filtro
-        </button>
-        <button id="reset-filter" class="cus-btn outline mt-2">
-            <span class="icon-wrapper">
-                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </span>
-            Restablecer
-        </button>
-    </div>
-</div>
-                                            <div class="sidebar-widget">
-                                                <div class="widget-title-row mb-24">
-                                                    <h5>Categorias</h5>
-                                                    <span><i class="fa-light fa-horizontal-rule"></i></span>
-                                                </div>
-                                                <div class="widget-content-block">
-                                                    <ul class="filter-list unstyled">
-                                                    @foreach ($categorias as $index => $categoria)
-<li>
-    <div class="filter-checkbox">
-        <input type="checkbox" id="category-{{ $index }}">
-        <label for="category-{{ $index }}">{{ $categoria->nombre }}</label>
-    </div>
-</li>
-@endforeach
-                                                    </ul>
-                                                </div>
-                                           </div>
+                    <div class="account-container">
+                        <div class="account-card">
+                            <div class="account-header">
+                                <!-- <div class="account-avatar">
+                                    <img src="assets/media/images/default-avatar.jpg" alt="Avatar del usuario">
+                                </div> -->
+                                <div>
+                                    <h1 class="account-title">Bienvenido, {{ Auth::user()->name }}</h1>
+                                   
+                                </div>
+                            </div>
+                            
+                            <div class="account-section">
+                                <h2 class="account-section-title">
+                                    Información Personal
+                                    <button class="btn-edit" onclick="editPersonalInfo()">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                </h2>
+                                
+                                <div class="account-info">
+                                    <div class="account-info-item">
+                                        <div class="account-info-label">Nombre completo:</div>
+                                        <div class="account-info-value" id="user-name">{{ Auth::user()->name }} {{ Auth::user()->lastname }}</div>
+                                    </div>
+                                    
+                                    <div class="account-info-item">
+                                        <div class="account-info-label">Correo electrónico:</div>
+                                        <div class="account-info-value" id="user-email">{{ Auth::user()->email }}</div>
+                                    </div>
+                                    
+                                    <div class="account-info-item">
+                                        <div class="account-info-label">Teléfono:</div>
+                                        <div class="account-info-value" id="user-phone">{{ Auth::user()->telefono ?? 'No proporcionado' }}</div>
+                                    </div>
+                                    
+                                    <div class="account-info-item">
+                                        <div class="account-info-label">Dirección:</div>
+                                        <div class="account-info-value" id="user-address">
+                                            {{ Auth::user()->direccion ?? 'No proporcionada' }} 
                                         </div>
                                     </div>
-                                    <div class="col-xl-9">
-                                        <div class="filter-row-2 mb-48">
-                                            <h4>Lista de productos</h4>
-                                            <div class="right-filters">
-                                                <ul class="unstyled layout-filter">
-                                                    <!-- <li class="filter-btn active"><a href=""><i class="fa-regular fa-list-ul"></i></a></li> -->
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <!-- Products List -->
 
-                                        <div class="container-fluid mt-4">
-    <ul class="product-list" id="product-list-container">
-        @foreach($productos as $producto)
-        <li class="product-list-card item-card mb-32" style="list-style: none;" data-product-id="{{ $producto->id }}" data-price="{{ $producto->precio }}"  data-category="{{ $producto->categoria->nombre }}" data-available="{{ $producto->disponibles }}" data-original-available="{{ $producto->disponibles }}">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="product-img text-center">
-                        <img src="{{ $producto->imagen }}" alt="{{ $producto->nombre }}" style="max-height: 200px;">
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="info text-md-start text-center">
-                        <a href="#" class="h4 title mb-16">{{ $producto->nombre }}</a>
-                        <div class="rating mb-16">
-                            <!-- Estrellas de rating -->
-                        </div>
-                        <h4 class="price mb-24">${{ number_format($producto->precio, 2) }}</h4>
-                        <p class="lead desc mb-32">{{ $producto->detalle }}</p>
-                        
-                        <!-- Campo para notas especiales -->
-                        <div class="mb-16">
-                            <label for="nota-{{ $producto->id }}" class="form-label">Notas especiales:</label>
-                            <input type="text" class="form-control nota-producto" id="nota-{{ $producto->id }}" 
-                                   placeholder="Ej: sin cebolla, poco picante, etc." data-product-id="{{ $producto->id }}">
-                        </div>
-                        
-                        <div class="action-block">
-                        <div class="quantity quantity-wrap">
-    <button type="button" class="decrement"><i class="fa-solid fa-dash"></i></button>
-    <input type="number" name="quantity" value="1" min="1" 
-           max="{{ $producto->disponibles }}" class="number" 
-           data-max="{{ $producto->disponibles }}">
-    <button type="button" class="increment"><i class="fa-solid fa-plus-large"></i></button>
-</div>
-                            <a href="javascript:;" class="cart-btn cart-button" onclick="addToCart(this)">
-                                <img src="assets/media/icons/shopping-cart.png" alt="">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </li>
-        @endforeach
-    </ul>
-</div>
-</div>
-                                        <!-- Pagination Start -->
-                                        <!-- <ul class="pagination text-center">
-                                            <li class="prev"><a href="#"><i class="fa-regular fa-chevron-left"></i></a></li>
-                                            <li class="active"><a href="#">1</a></li>
-                                            <li><a href="#">2</a></li>
-                                            <li><a href="#">3</a></li>
-                                            <li><a href="#">...</a></li>
-                                            <li><a href="#">10</a></li>
-                                            <li class="next"><a href="#"><i class="fa-regular fa-chevron-right"></i></a></li>
-                                        </ul> -->
-                                        <!-- Pagination End -->
+                                    <div class="account-info-item">
+                                        <div class="account-info-label">Referencia de envío:</div>
+                                        <div class="account-info-value" id="user-reference">
+                                            {{ Auth::user()->referencia_envio ?? 'No proporcionada' }} 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            
+
+                            
+                            <div class="account-actions">
+                                <button class="btn btn-outline-primary" onclick="changePassword()">
+                                    <i class="fas fa-lock"></i> Cambiar contraseña
+                                </button>
+                                <form method="POST" action="{{ route('logoutUser') }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                         </section>
                         <!-- Blogs Section End -->
                         
@@ -449,6 +530,276 @@
         <script src="assets/js/vendor/jquery.nice-select.min.js"></script>
         <script src="assets/js/vendor/slick.min.js"></script>
         <script src="assets/js/app.js"></script>
+
+        <script>
+        // Función para editar información personal
+        function editPersonalInfo() {
+    // Obtener los valores actuales
+    const name = document.getElementById('user-name')?.textContent || '';
+    const email = document.getElementById('user-email')?.textContent || '';
+    const phone = document.getElementById('user-phone')?.textContent || '';
+    const address = document.getElementById('user-address')?.textContent || '';
+    const reference = document.getElementById('user-reference')?.textContent || '';
+    
+    // Crear formulario de edición con validación de elementos
+    const formHtml = `
+        <form id="edit-info-form">
+            <div class="mb-3">
+                <label for="edit-name" class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" id="edit-name" value="${name}">
+            </div>
+            <div class="mb-3">
+                <label for="edit-email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="edit-email" value="${email}">
+            </div>
+            <div class="mb-3">
+                <label for="edit-phone" class="form-label">Teléfono</label>
+                <input type="tel" class="form-control" id="edit-phone" value="${phone === 'No proporcionado' ? '' : phone}">
+            </div>
+            <div class="mb-3">
+                <label for="edit-address" class="form-label">Dirección</label>
+                <textarea class="form-control" id="edit-address" rows="3">${address === 'No proporcionada' ? '' : address}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="edit-reference" class="form-label">Referencia de envío</label>
+                <textarea class="form-control" id="edit-reference" rows="3">${reference === 'No proporcionada' ? '' : reference}</textarea>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="savePersonalInfo()">Guardar</button>
+            </div>
+        </form>
+    `;
+    
+    // Reemplazar la sección de información con el formulario
+    const accountInfoSection = document.querySelector('.account-info');
+    if (accountInfoSection) {
+        accountInfoSection.innerHTML = formHtml;
+    } else {
+        console.error('No se encontró la sección de información de la cuenta');
+        showToast('Error al cargar el formulario de edición', true);
+    }
+}
+        
+        // Función para cancelar la edición
+        function cancelEdit() {
+            // Recargar la página para mostrar los datos originales
+            location.reload();
+        }
+        
+        function savePersonalInfo() {
+    // Obtener los nuevos valores
+    const newName = document.getElementById('edit-name').value;
+    const newEmail = document.getElementById('edit-email').value;
+    const newPhone = document.getElementById('edit-phone').value;
+    const newAddress = document.getElementById('edit-address').value;
+    const newReference = document.getElementById('edit-reference').value;
+    
+    // Validar campos obligatorios
+    if (!newName || !newEmail) {
+        showToast('Nombre y correo electrónico son campos obligatorios', true);
+        return;
+    }
+    
+    // Mostrar estado de carga
+    const saveButton = document.querySelector('#edit-info-form button[onclick="savePersonalInfo()"]');
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    saveButton.disabled = true;
+    
+    // Enviar datos al servidor
+    fetch('{{ route("actualizar.perfil") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            name: newName,
+            email: newEmail,
+            phone: newPhone,
+            address: newAddress,
+            reference: newReference
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast('Información actualizada correctamente');
+            
+            // Reconstruir la sección de información con los nuevos datos
+            const accountInfoHTML = `
+                <div class="account-info-item">
+                    <div class="account-info-label">Nombre completo:</div>
+                    <div class="account-info-value" id="user-name">${data.user.name}</div>
+                </div>
+                
+                <div class="account-info-item">
+                    <div class="account-info-label">Correo electrónico:</div>
+                    <div class="account-info-value" id="user-email">${data.user.email}</div>
+                </div>
+                
+                <div class="account-info-item">
+                    <div class="account-info-label">Teléfono:</div>
+                    <div class="account-info-value" id="user-phone">${data.user.telefono || 'No proporcionado'}</div>
+                </div>
+                
+                <div class="account-info-item">
+                    <div class="account-info-label">Dirección:</div>
+                    <div class="account-info-value" id="user-address">
+                        ${data.user.direccion || 'No proporcionada'}
+                    </div>
+                </div>
+
+                <div class="account-info-item">
+                    <div class="account-info-label">Referencia de envío:</div>
+                    <div class="account-info-value" id="user-reference">
+                        ${data.user.referencia_envio || 'No proporcionada'}
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.account-info').innerHTML = accountInfoHTML;
+            
+            // Volver a asignar el evento de edición
+            document.querySelector('.account-section-title button').onclick = editPersonalInfo;
+        } else {
+            throw new Error(data.message || 'Error al actualizar');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast(error.message || 'Ocurrió un error al actualizar tu información', true);
+    })
+    .finally(() => {
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+    });
+}
+        
+        // Función para cambiar contraseña
+        function changePassword() {
+            const modalHtml = `
+                <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Cambiar contraseña</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="change-password-form">
+                                    <div class="mb-3">
+                                        <label for="current-password" class="form-label">Contraseña actual</label>
+                                        <input type="password" class="form-control" id="current-password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new-password" class="form-label">Nueva contraseña</label>
+                                        <input type="password" class="form-control" id="new-password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirm-password" class="form-label">Confirmar nueva contraseña</label>
+                                        <input type="password" class="form-control" id="confirm-password" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" onclick="submitPasswordChange()">Guardar cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar el modal al body
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            modal.show();
+            
+            // Eliminar el modal cuando se cierre
+            document.getElementById('changePasswordModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+        
+        function submitPasswordChange() {
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    // Validaciones básicas
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Todos los campos son obligatorios');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        alert('Las contraseñas nuevas no coinciden');
+        return;
+    }
+    
+    if (newPassword.length < 8) {
+        alert('La contraseña debe tener al menos 8 caracteres');
+        return;
+    }
+
+    // Mostrar loader
+    const submitBtn = document.querySelector('#changePasswordModal button[onclick="submitPasswordChange()"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cambiando...';
+    submitBtn.disabled = true;
+
+    // Enviar al servidor
+    fetch('{{ route("cambiar.contrasena") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword,
+            new_password_confirmation: confirmPassword
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast('Contraseña cambiada exitosamente');
+            // Cerrar el modal
+            bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+            // Limpiar el formulario
+            document.getElementById('change-password-form').reset();
+        } else {
+            throw new Error(data.message || 'Error al cambiar la contraseña');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast(error.message || 'Error al cambiar la contraseña', true);
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+    </script>
+
         <script>
 // Carrito como array de objetos
 let cart = [];
