@@ -104,3 +104,6 @@ Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
 
      Route::get('/ComprobanteVer/{filename}', [PedidoController::class, 'showComprobante'])
      ->name('comprobante.show');
+
+     Route::post('/actualizar-comprobante', [PedidoController::class, 'actualizarComprobante'])
+     ->name('actualizar.comprobante');

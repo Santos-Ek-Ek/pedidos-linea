@@ -395,6 +395,12 @@
 
         <script>
 $(document).ready(function() {
+    // Resetear el modal cada vez que se abre
+    $('#updateComprobanteModal').on('show.bs.modal', function() {
+        $(this).find('form')[0].reset();
+        $(this).find('button[type="submit"]').html('Guardar cambios').prop('disabled', false);
+    });
+
     $('.update-comprobante').click(function() {
         var pedidoId = $(this).data('pedido-id');
         $('#pedido_id').val(pedidoId);
@@ -404,20 +410,42 @@ $(document).ready(function() {
     $('#updateComprobanteForm').submit(function(e) {
         e.preventDefault();
         var formData = new FormData(this);
+        var button = $(this).find('button[type="submit"]');
+        var modal = $(this).closest('.modal');
+        
+        // Mostrar mensaje de carga
+        button.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...').prop('disabled', true);
         
         $.ajax({
-            url: '/actualizar-comprobante', // Ajusta esta ruta según tu backend
+            url: '/actualizar-comprobante',
             type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
             success: function(response) {
-                $('#updateComprobanteModal').modal('hide');
-                alert('Comprobante actualizado correctamente');
-                location.reload(); // Recarga la página para ver los cambios
+                modal.modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    location.reload();
+                });
             },
             error: function(xhr) {
-                alert('Error al actualizar el comprobante: ' + xhr.responseText);
+                let errorMsg = 'Error al actualizar el comprobante';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMsg
+                });
+                // Resetear el botón en caso de error
+                button.html('Guardar cambios').prop('disabled', false);
             }
         });
     });

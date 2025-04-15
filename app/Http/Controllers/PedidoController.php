@@ -179,4 +179,50 @@ class PedidoController extends Controller
 
     return response()->json(['success' => true]);
 }
+
+
+public function actualizarComprobante(Request $request)
+{
+    $request->validate([
+        'pedido_id' => 'required|exists:pedidos,id',
+        'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
+    ]);
+
+    $pedidoOriginal = Pedidos::findOrFail($request->pedido_id);
+
+    if (!$pedidoOriginal->comprobante_paypal) {
+        return response()->json([
+            'success' => false,
+            'message' => 'El pedido no tiene un comprobante asociado'
+        ], 400);
+    }
+
+    // Obtener todos los pedidos con el mismo comprobante
+    $pedidosConMismoComprobante = Pedidos::where('comprobante_paypal', $pedidoOriginal->comprobante_paypal)->get();
+
+    // Eliminar el comprobante anterior si existe
+    $oldFilePath = public_path($pedidoOriginal->comprobante_paypal);
+    if (file_exists($oldFilePath)) {
+        unlink($oldFilePath);
+    }
+
+    // Generar nombre del archivo igual que en store()
+    $file = $request->file('comprobante');
+    $numeroComprobante = 'PYP-' . strtoupper(Str::random(8));
+    $filename = 'comprobante_'.$numeroComprobante.'.'.$file->getClientOriginalExtension();
+    $path = 'pagos/'.$filename;
+    
+    // Mover el archivo a public/pagos
+    $file->move(public_path('pagos'), $filename);
+
+    // Actualizar todos los pedidos con el mismo comprobante
+    Pedidos::where('comprobante_paypal', $pedidoOriginal->comprobante_paypal)
+           ->update(['comprobante_paypal' => $path]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Comprobante actualizado para '.$pedidosConMismoComprobante->count().' pedidos',
+        'new_path' => $path // Opcional: devolver la nueva ruta
+    ]);
+}
 }
