@@ -20,12 +20,12 @@ use App\Http\Controllers\ventaProductoController;
 */
 
 // Rutas de autenticación
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('loginUser');
+Route::get('/registerUser', [AuthController::class, 'showRegisterForm'])->name('registerUser');
+Route::post('/registerUser', [AuthController::class, 'register'])->name('registerUser.submit');
+Route::get('/loginUser', [AuthController::class, 'showLoginForm'])->name('loginUser');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submitUser');
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logoutUser');
+Route::post('/logoutUser', [AuthController::class, 'logout'])->name('logoutUser');
 Route::get('/', function () {
     return redirect()->route('productosVenta');
 });
@@ -36,7 +36,8 @@ Route::get('/carrito', function () {
 
 Route::get('/checkout', function () {
     return view('contenido.checkout');
-});
+})->middleware('auth');
+
 Route::get('/contactanos', function () {
     return view('contenido.contactanos');
 });
@@ -49,27 +50,6 @@ Route::get('/productosVenta', [ventaProductoController::class, 'index'])->name('
 
 
 
-Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos']);
-
-Route::get('/producto', [administracionController::class, 'mostrarProductos']);
-Route::post('/productos/agregar', [administracionController::class, 'agregarProductos'])->name('productos.agregar');
-Route::prefix('producto')->group(function () {
-Route::get('/{id}/edit', [administracionController::class, 'editarProducto'])->name('producto.editar');
-Route::put('/{id}', [administracionController::class, 'actualizarProducto'])->name('producto.actualizar');
-Route::put('/{id}/eliminar', [administracionController::class, 'eliminarProducto'])->name('producto.eliminar');
-
-});
-
-Route::get('/usuarios', [administracionController::class, 'mostrarUsuarios']);
-Route::put('/usuarios/{id}', [administracionController::class, 'eliminarUsuario'])->name('user.eliminar');
-
-Route::get('/categorias', [administracionController::class, 'mostrarCategoria']);
-Route::post('/categorias/agregar', [administracionController::class, 'agregarCategoria'])->name('categoria.agregar');
-Route::put('/categorias/eliminar/{id}', [administracionController::class, 'eliminarCategoria'])->name('categoria.eliminar');
-Route::prefix('categorias')->group(function () {
-    Route::get('/{id}/edit', [administracionController::class, 'editarCategoria'])->name('categoria.editar');
-    Route::put('/{id}', [administracionController::class, 'actualizarCategoria'])->name('categoria.actualizar');
-});
 
 
 Route::prefix('administrador')->group(function () {
@@ -78,6 +58,28 @@ Route::prefix('administrador')->group(function () {
     Route::post('/logout', [authAdminController::class, 'logout'])->name('logout');
     Route::get('/register', [authAdminController::class, 'showRegisterForm'])->name('admin.register');
     Route::post('/register', [authAdminController::class, 'register'])->name('admin.register.submit');
+    
+Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos'])->middleware('auth');
+
+Route::get('/producto', [administracionController::class, 'mostrarProductos'])->middleware('auth');
+Route::post('/productos/agregar', [administracionController::class, 'agregarProductos'])->name('productos.agregar')->middleware('auth');
+Route::prefix('producto')->group(function () {
+Route::get('/{id}/edit', [administracionController::class, 'editarProducto'])->name('producto.editar');
+Route::put('/{id}', [administracionController::class, 'actualizarProducto'])->name('producto.actualizar');
+Route::put('/{id}/eliminar', [administracionController::class, 'eliminarProducto'])->name('producto.eliminar');
+
+})->middleware('auth');
+
+Route::get('/usuarios', [administracionController::class, 'mostrarUsuarios'])->middleware('auth');
+Route::put('/usuarios/{id}', [administracionController::class, 'eliminarUsuario'])->name('user.eliminar')->middleware('auth');
+
+Route::get('/categorias', [administracionController::class, 'mostrarCategoria'])->middleware('auth');
+Route::post('/categorias/agregar', [administracionController::class, 'agregarCategoria'])->name('categoria.agregar');
+Route::put('/categorias/eliminar/{id}', [administracionController::class, 'eliminarCategoria'])->name('categoria.eliminar');
+Route::prefix('categorias')->group(function () {
+    Route::get('/{id}/edit', [administracionController::class, 'editarCategoria'])->name('categoria.editar');
+    Route::put('/{id}', [administracionController::class, 'actualizarCategoria'])->name('categoria.actualizar');
+})->middleware('auth');
 });
 
 Route::get('/tickets/{filename}', function ($filename) {
@@ -99,11 +101,11 @@ Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
      Route::put('/pedidos/{id}/update-status', [PedidoController::class, 'updateStatus'])
      ->name('pedidos.updateStatus');
 
-     Route::get('/misCompras', [comprasController::class, 'misPedidos']);
+     Route::get('/misCompras', [comprasController::class, 'misPedidos'])->middleware('auth');
 
 
      Route::get('/ComprobanteVer/{filename}', [PedidoController::class, 'showComprobante'])
      ->name('comprobante.show');
 
      Route::post('/actualizar-comprobante', [PedidoController::class, 'actualizarComprobante'])
-     ->name('actualizar.comprobante');
+     ->name('actualizar.comprobante')->middleware('auth');

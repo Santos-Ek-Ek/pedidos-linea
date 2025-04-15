@@ -192,7 +192,7 @@
         </ul>
     </div>
 @else
-    <a href="{{ url('login') }}" class="ui-header-tools-item"><i class="fa-regular fa-user"></i></a>
+    <a href="{{ route('loginUser') }}" class="ui-header-tools-item"><i class="fa-regular fa-user"></i></a>
 @endauth
                                         <a href="carrito" class="ui-header-tools-item cart-button"><i class="fa-regular fa-cart-shopping"></i></a>
                                     </div>

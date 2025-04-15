@@ -138,7 +138,7 @@
                                                                     </li>
                                                                     <!-- End submenu (sub-master) -->
                 
-                                                                    <!-- <li><a href="contact-us.html">Contactanos</a></li> -->
+                                                                    <li><a href="contactanos">Contactanos</a></li>
                 
                                                                 </ul>
                                                                 <!-- End menu list -->
@@ -192,7 +192,7 @@
         </ul>
     </div>
 @else
-    <a href="{{ url('login') }}" class="ui-header-tools-item"><i class="fa-regular fa-user"></i></a>
+    <a href="{{ route('loginUser') }}" class="ui-header-tools-item"><i class="fa-regular fa-user"></i></a>
 @endauth
                                         <a href="carrito" class="ui-header-tools-item cart-button"><i class="fa-regular fa-cart-shopping"></i></a>
                                     </div>
@@ -392,6 +392,778 @@
         <script src="assets/js/vendor/jquery.nice-select.min.js"></script>
         <script src="assets/js/vendor/slick.min.js"></script>
         <script src="assets/js/app.js"></script>
+
+        <script>
+ document.addEventListener('DOMContentLoaded', function() {
+    // Generar horarios de 9am a 11pm en intervalos de 1 hora
+    function generateTimeSlots() {
+        const hours = [];
+        for (let i = 9; i <= 22; i++) {
+            const hour = i > 12 ? i - 12 : i;
+            const ampm = i >= 12 ? 'pm' : 'am';
+            const nextHour = (i + 1) > 12 ? (i + 1) - 12 : (i + 1);
+            const nextAmpm = (i + 1) >= 12 ? 'pm' : 'am';
+            const timeRange = `${hour}:00${ampm} - ${nextHour}:00${nextAmpm}`;
+            
+            hours.push({
+                display: timeRange,
+                value: timeRange
+            });
+        }
+        return hours;
+    }
+
+    const timeSlots = generateTimeSlots();
+    const pickupSelect = document.getElementById('pickup-time');
+    const deliverySelect = document.getElementById('delivery-time');
+
+    // Llenar los select con las opciones de horario
+    timeSlots.forEach(slot => {
+        const pickupOption = document.createElement('option');
+        pickupOption.value = slot.value;
+        pickupOption.textContent = slot.display;
+        pickupSelect.appendChild(pickupOption.cloneNode(true));
+
+        const deliveryOption = pickupOption.cloneNode(true);
+        deliverySelect.appendChild(deliveryOption);
+    });
+
+    // Obtener elementos del DOM
+    const form = document.getElementById('formPedido');
+      const payWithPaypalOption = document.getElementById('pay-with-paypal-option');
+
+    const productosInput = document.getElementById('productos-carrito');
+    const orderSummary = document.getElementById('order-summary');
+    const orderTotalElement = document.getElementById('order-total');
+    const deliveryOptions = document.querySelectorAll('.delivery-option');
+    const payOnDeliveryOption = document.getElementById('pay-on-delivery-option');
+    const payOnPickupOption = document.getElementById('pay-on-pickup-option');
+    const pickupTimeContainer = document.getElementById('pickup-time-container');
+    const deliveryTimeContainer = document.getElementById('delivery-time-container');
+
+    // Obtener la opción seleccionada inicialmente
+    let selectedOption = document.querySelector('.delivery-option:checked').value;
+
+    // Funciones auxiliares
+    function getCart() {
+        const cartData = localStorage.getItem('shoppingCart');
+        return cartData ? JSON.parse(cartData) : [];
+    }
+    
+    function clearCart() {
+        localStorage.removeItem('shoppingCart');
+        const event = new Event('cartCleared');
+        window.dispatchEvent(event);
+    }
+    
+    function updateProductosInput() {
+        productosInput.value = JSON.stringify(getCart());
+    }
+
+
+    // Función para calcular y mostrar el total con/sin costo de envío
+    function calculateTotal(subtotal, deliveryOption) {
+        const deliveryCost = 5.00;
+        let total = subtotal;
+        let deliveryFeeElement = document.getElementById('delivery-fee');
+        
+        if (deliveryOption === 'Enviar a domicilio') {
+            total += deliveryCost;
+            if (!deliveryFeeElement) {
+                const summaryContainer = document.getElementById('order-summary');
+                deliveryFeeElement = document.createElement('div');
+                deliveryFeeElement.id = 'delivery-fee';
+                deliveryFeeElement.className = 'd-flex justify-content-between align-items-center mb-16';
+                deliveryFeeElement.innerHTML = `
+                    <div>
+                        <p class="lead color-black mb-0">Costo de envío</p>
+                    </div>
+                    <p class="lead">$${deliveryCost.toFixed(2)}</p>
+                `;
+                summaryContainer.appendChild(deliveryFeeElement);
+            } else {
+                deliveryFeeElement.querySelector('p.lead').textContent = `$${deliveryCost.toFixed(2)}`;
+                deliveryFeeElement.style.display = 'flex';
+            }
+        } else if (deliveryFeeElement) {
+            deliveryFeeElement.style.display = 'none';
+        }
+        
+        return total;
+    }
+
+    function renderOrderSummary(cart, deliveryOption) {
+        let subtotal = 0;
+        orderSummary.innerHTML = '';
+
+        if (cart.length === 0) {
+            orderSummary.innerHTML = '<p class="text-center">No hay productos en el carrito</p>';
+            orderTotalElement.textContent = '$0.00';
+            updateOrderButtonState();
+            return;
+        }
+
+        cart.forEach(product => {
+            const productTotal = product.price * product.quantity;
+            subtotal += productTotal;
+
+            const productRow = document.createElement('div');
+            productRow.className = 'd-flex justify-content-between align-items-center mb-16';
+            productRow.innerHTML = `
+                <div>
+                    <p class="lead color-black mb-0">${product.name} x${product.quantity}</p>
+                    ${product.nota ? `<small class="text-muted">Nota: ${product.nota}</small>` : ''}
+                </div>
+                <p class="lead">$${productTotal.toFixed(2)}</p>
+            `;
+            orderSummary.appendChild(productRow);
+        });
+
+        const total = calculateTotal(subtotal, deliveryOption);
+        orderTotalElement.textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Configurar el estado inicial
+// Configurar el estado inicial
+if (selectedOption === 'Pasar a recoger') {
+    pickupTimeContainer.style.display = 'block';
+    deliveryTimeContainer.style.display = 'none';
+    payOnDeliveryOption.style.display = 'none';
+    payWithPaypalOption.style.display = 'none';
+    payOnPickupOption.style.display = 'block';
+    document.getElementById('cp').checked = true;
+} else {
+    deliveryTimeContainer.style.display = 'block';
+    pickupTimeContainer.style.display = 'none';
+    payOnDeliveryOption.style.display = 'block';
+    payWithPaypalOption.style.display = 'block';
+    payOnPickupOption.style.display = 'none';
+    document.getElementById('cod').checked = true;
+    initPayPalButton();
+}
+
+    // Mostrar carrito inicial
+    const cart = getCart();
+    renderOrderSummary(cart, selectedOption);
+    updateProductosInput();
+
+   // En el event listener de las opciones de entrega
+deliveryOptions.forEach(option => {
+    option.addEventListener('change', function() {
+        selectedOption = this.value;
+        const cart = getCart();
+        renderOrderSummary(cart, selectedOption);
+        
+        if (this.value === 'Pasar a recoger') {
+            pickupTimeContainer.style.display = 'block';
+            deliveryTimeContainer.style.display = 'none';
+            payOnDeliveryOption.style.display = 'none';
+            payWithPaypalOption.style.display = 'none';
+            payOnPickupOption.style.display = 'block';
+            document.getElementById('cp').checked = true;
+            document.getElementById('paypal-button-container').style.display = 'none';
+        } else if (this.value === 'Enviar a domicilio') {
+            deliveryTimeContainer.style.display = 'block';
+            pickupTimeContainer.style.display = 'none';
+            payOnDeliveryOption.style.display = 'block';
+            payWithPaypalOption.style.display = 'block';
+            payOnPickupOption.style.display = 'none';
+            document.getElementById('cod').checked = true;
+            document.getElementById('paypal-button-container').style.display = 'none';
+        }
+    });
+});
+
+    // Manejar envío del formulario
+    form.addEventListener('submit', function(e) {
+        setTimeout(() => {
+            clearCart();
+        }, 200);
+    });
+    
+    // Actualizar cuando cambia el carrito
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart' || event.key === 'cart-cleared') {
+            const updatedCart = getCart();
+            renderOrderSummary(updatedCart, selectedOption);
+            updateProductosInput();
+        }
+    });
+});
+</script>
+<script>
+// Función para obtener el carrito del localStorage
+function getCart() {
+    const cartData = localStorage.getItem('shoppingCart');
+    return cartData ? JSON.parse(cartData) : [];
+}
+
+// Función para actualizar el mini carrito
+function updateMiniCart() {
+    const cart = getCart();
+    const cartItemsContainer = document.getElementById('cart-items');
+    const subtotalElement = document.getElementById('cart-subtotal');
+    
+    cartItemsContainer.innerHTML = '';
+    
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<li class="empty-cart-message">Tu carrito está vacío</li>';
+        subtotalElement.textContent = '$0.00';
+        return;
+    }
+    
+    let subtotal = 0;
+    
+    cart.forEach((product, index) => {
+        const productTotal = product.price * product.quantity;
+        subtotal += productTotal;
+        
+        const productItem = document.createElement('li');
+        productItem.className = 'product-item mb-24';
+        productItem.innerHTML = `
+            <a href="">
+                <span class="item-image">
+                    <img src="${product.image}" alt="${product.name}">
+                </span>
+            </a>
+            <div class="product-text">
+                <a href="">
+                    <h6 class="mb-16 dark-gray">${product.name}</h6>
+                    ${product.nota ? `<span class="nota-especial">Nota: ${product.nota}</span>` : ''}
+                </a>
+                <div class="qp_row">
+                    <div class="quantity quantity-wrap">
+                        <div class="decrement" data-index="${index}"><i class="fa-solid fa-dash"></i></div>
+                        <input type="number" name="quantity" value="${product.quantity}" min="1" 
+                               max="${product.maxQuantity}" class="number" id="cart-qty-${index}">
+                        <div class="increment" data-index="${index}"><i class="fa-solid fa-plus-large"></i></div>
+                    </div>
+                    <h5 class="dark-gray">$${productTotal.toFixed(2)}</h5>
+                    <button class="remove-item" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+        
+        cartItemsContainer.appendChild(productItem);
+        
+        if (index < cart.length - 1) {
+            const divider = document.createElement('li');
+            divider.className = 'vr-line mb-24';
+            cartItemsContainer.appendChild(divider);
+        }
+    });
+    
+    // Agregar event listeners a los nuevos elementos
+    document.querySelectorAll('.decrement').forEach(btn => {
+        btn.addEventListener('click', function() {
+            updateCartQuantity(parseInt(this.getAttribute('data-index')), -1);
+        });
+    });
+    
+    document.querySelectorAll('.increment').forEach(btn => {
+        btn.addEventListener('click', function() {
+            updateCartQuantity(parseInt(this.getAttribute('data-index')), 1);
+        });
+    });
+    
+    document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', function() {
+            removeFromCart(parseInt(this.getAttribute('data-index')));
+        });
+    });
+    
+    document.querySelectorAll('.number').forEach(input => {
+        input.addEventListener('change', function() {
+            const index = parseInt(this.id.replace('cart-qty-', ''));
+            validateCartQuantity(index, this);
+        });
+    });
+    
+    subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+}
+
+// Función para actualizar cantidad en el carrito
+function updateCartQuantity(index, change) {
+    const cart = getCart();
+    const newQuantity = cart[index].quantity + change;
+    
+    if (newQuantity >= 1 && newQuantity <= cart[index].maxQuantity) {
+        cart[index].quantity = newQuantity;
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+        updateMiniCart();
+    }
+}
+
+// Función para validar cantidad manualmente ingresada
+function validateCartQuantity(index, input) {
+    const cart = getCart();
+    const newQuantity = parseInt(input.value);
+    const maxQuantity = cart[index].maxQuantity;
+    
+    if (isNaN(newQuantity)) {
+        input.value = 1;
+        cart[index].quantity = 1;
+    } else if (newQuantity < 1) {
+        input.value = 1;
+        cart[index].quantity = 1;
+    } else if (newQuantity > maxQuantity) {
+        input.value = maxQuantity;
+        cart[index].quantity = maxQuantity;
+    } else {
+        cart[index].quantity = newQuantity;
+    }
+    
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    updateMiniCart();
+}
+
+// Función para eliminar producto del carrito
+function removeFromCart(index) {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
+        const cart = getCart();
+        cart.splice(index, 1);
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+        updateMiniCart();
+    }
+}
+
+// Inicialización cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar el botón del carrito
+    document.querySelector('.cart-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        updateMiniCart();
+        document.getElementById('sidebar-cart').classList.add('active');
+        document.getElementById('sidebar-cart-curtain').classList.add('active');
+    });
+   // Actualizar estado del botón al cargar la página
+   updateOrderButtonState();
+    
+    // Validar formulario antes de enviar
+    
+    // Actualizar estado del botón cuando cambia el carrito
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart' || event.key === 'cart-cleared') {
+            const updatedCart = getCart();
+            renderOrderSummary(updatedCart, selectedOption);
+            updateProductosInput();
+            updateOrderButtonState(); // <- Añade esta línea
+        }
+    });
+    // Configurar el botón de cerrar
+    document.querySelector('#sidebar-cart .close-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleMiniCart(false);
+    });
+    
+    // Cerrar al hacer clic en la cortina
+    document.getElementById('sidebar-cart-curtain').addEventListener('click', function() {
+        toggleMiniCart(false);
+    });
+    
+    // Cerrar al presionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            toggleMiniCart(false);
+        }
+    });
+
+    // Escuchar cambios en el localStorage
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            updateMiniCart();
+        }
+    });
+    
+    // Actualizar el mini carrito al cargar la página
+    updateMiniCart();
+
+
+});
+// Función para abrir/cerrar el mini carrito
+function toggleMiniCart(open = true) {
+    const cart = document.getElementById('sidebar-cart');
+    const curtain = document.getElementById('sidebar-cart-curtain');
+    
+    if (open) {
+        updateMiniCart(); // Actualizar contenido antes de mostrar
+        cart.classList.add('active');
+        curtain.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Evitar scroll del body
+    } else {
+        cart.classList.remove('active');
+        curtain.classList.remove('active');
+        document.body.style.overflow = ''; // Restaurar scroll
+    }
+}
+
+// Configurar event listeners para el mini carrito
+function setupMiniCartListeners() {
+    // Botón para abrir el carrito
+    document.querySelectorAll('.cart-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleMiniCart(true);
+        });
+    });
+    
+    // Botón para cerrar el carrito
+    document.querySelector('#sidebar-cart .close-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleMiniCart(false);
+    });
+    
+    // Cerrar al hacer clic en la cortina
+    document.getElementById('sidebar-cart-curtain').addEventListener('click', function() {
+        toggleMiniCart(false);
+    });
+    
+    // Cerrar al presionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            toggleMiniCart(false);
+        }
+    });
+}
+
+// En el DOMContentLoaded:
+document.addEventListener('DOMContentLoaded', function() {
+    setupMiniCartListeners();
+    updateMiniCart();
+    
+    // Resto de tu código de inicialización...
+});
+function updateOrderButtonState() {
+    const cart = getCart();
+    const submitBtn = document.getElementById('submit-order-btn');
+    const emptyCartAlert = document.getElementById('empty-cart-alert');
+    
+    if (cart.length === 0) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+        emptyCartAlert.style.display = 'block';
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('disabled');
+        emptyCartAlert.style.display = 'none';
+    }
+}
+
+function validateFormBeforeSubmit(e) {
+    const cart = getCart();
+    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+    const comprobanteInput = document.getElementById('comprobante-pago');
+    
+    if (cart.length === 0) {
+        e.preventDefault();
+        alert('No puedes realizar un pedido con el carrito vacío');
+        return false;
+    }
+    
+    // Validar comprobante solo si el método es PayPal
+    if (metodoPago === 'PayPal') {
+        if (comprobanteInput.files.length === 0) {
+            e.preventDefault();
+            alert('Por favor sube una captura del comprobante de pago de PayPal');
+            comprobanteInput.focus();
+            return false;
+        }
+        
+        // Validar tipo de archivo
+        const file = comprobanteInput.files[0];
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+        if (!validTypes.includes(file.type)) {
+            e.preventDefault();
+            alert('Por favor sube una imagen (JPEG, PNG, GIF) o PDF como comprobante');
+            return false;
+        }
+    }
+    
+    // Si todo está bien, proceder con el envío
+    setTimeout(() => {
+        clearCart();
+    }, 200);
+    
+    return true;
+}
+
+// Configurar listeners para métodos de pago
+document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const paypalContainer = document.getElementById('paypal-button-container');
+        const comprobanteContainer = document.getElementById('comprobante-pago-container');
+        
+        if (this.value === 'PayPal') {
+            paypalContainer.style.display = 'block';
+            comprobanteContainer.style.display = 'block';
+            document.getElementById('comprobante-pago').required = true;
+            if (paypalContainer.children.length === 0) {
+                initPayPalButton();
+            }
+        } else {
+            paypalContainer.style.display = 'none';
+            comprobanteContainer.style.display = 'none';
+            document.getElementById('comprobante-pago').required = false;
+        }
+    });
+});
+
+// Listener para el formulario
+form.addEventListener('submit', validateFormBeforeSubmit);
+
+// En tu evento DOMContentLoaded, agrega estas definiciones al inicio:
+const payWithPaypalOption = document.getElementById('pay-with-paypal-option');
+let selectedOption = document.querySelector('.delivery-option:checked').value;
+const SHIPPING_COST = 5.00; // Definimos el costo de envío como constante
+
+function initPayPalButton() {
+    // Limpia el contenedor primero para evitar múltiples botones
+    document.getElementById('paypal-button-container').innerHTML = '';
+    const cart = getCart();
+    
+    let subtotal = 0;
+    cart.forEach(product => {
+        subtotal += product.price * product.quantity;
+    });
+    
+    const shippingCost = 5.00;
+    const total = subtotal + shippingCost;
+    
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+        },
+        
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: total.toFixed(2),
+                        currency_code: "MXN",
+                        breakdown: {
+                            item_total: {
+                                value: subtotal.toFixed(2),
+                                currency_code: "MXN"
+                            },
+                            shipping: {
+                                value: shippingCost.toFixed(2),
+                                currency_code: "MXN"
+                            }
+                        }
+                    },
+                    items: cart.map(item => ({
+                        name: item.name.substring(0, 127),
+                        unit_amount: {
+                            value: item.price.toFixed(2),
+                            currency_code: "MXN"
+                        },
+                        quantity: item.quantity.toString()
+                    }))
+                }],
+                application_context: {
+                    shipping_preference: 'NO_SHIPPING'
+                }
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // 1. Primero cerramos el sandbox de PayPal
+                const paypalContainer = document.getElementById('paypal-button-container');
+                paypalContainer.innerHTML = ''; // Esto elimina completamente el botón
+                
+                // 2. Marcamos PayPal como método de pago seleccionado
+                document.getElementById('paypal').checked = true;
+                
+                // 3. Configuramos los datos de PayPal en el formulario
+                const form = document.getElementById('formPedido');
+                
+                if (!document.getElementById('paypal_transaction_id')) {
+                    const transactionId = document.createElement('input');
+                    transactionId.type = 'hidden';
+                    transactionId.name = 'paypal_transaction_id';
+                    transactionId.id = 'paypal_transaction_id';
+                    form.appendChild(transactionId);
+                }
+                
+                if (!document.getElementById('paypal_payer_email')) {
+                    const payerEmail = document.createElement('input');
+                    payerEmail.type = 'hidden';
+                    payerEmail.name = 'paypal_payer_email';
+                    payerEmail.id = 'paypal_payer_email';
+                    form.appendChild(payerEmail);
+                }
+                
+                document.getElementById('paypal_transaction_id').value = details.id;
+                document.getElementById('paypal_payer_email').value = details.payer.email_address;
+                
+                // 4. Mostramos el campo para subir comprobante
+                const comprobanteContainer = document.getElementById('comprobante-pago-container');
+                comprobanteContainer.style.display = 'block';
+                document.getElementById('comprobante-pago').required = true;
+                
+                // 5. Mostramos mensaje al usuario (después de cerrar el sandbox)
+                setTimeout(() => {
+                    alert('Pago con PayPal completado. Ahora por favor sube una captura del comprobante.');
+                }, 100);
+            });
+        },
+        
+        onError: function(err) {
+            console.error(err);
+            alert('Ocurrió un error al procesar el pago con PayPal. Por favor intenta nuevamente.');
+        },
+        
+        onCancel: function(data) {
+            // Cuando el usuario cancela el pago
+            alert('Has cancelado el pago con PayPal. Puedes intentarlo nuevamente si lo deseas.');
+        }
+    }).render('#paypal-button-container');
+}function initPayPalButton() {
+    // Limpia el contenedor primero para evitar múltiples botones
+    document.getElementById('paypal-button-container').innerHTML = '';
+    const cart = getCart();
+    
+    let subtotal = 0;
+    cart.forEach(product => {
+        subtotal += product.price * product.quantity;
+    });
+    
+    const shippingCost = 5.00;
+    const total = subtotal + shippingCost;
+    
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+        },
+        
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: total.toFixed(2),
+                        currency_code: "MXN",
+                        breakdown: {
+                            item_total: {
+                                value: subtotal.toFixed(2),
+                                currency_code: "MXN"
+                            },
+                            shipping: {
+                                value: shippingCost.toFixed(2),
+                                currency_code: "MXN"
+                            }
+                        }
+                    },
+                    items: cart.map(item => ({
+                        name: item.name.substring(0, 127),
+                        unit_amount: {
+                            value: item.price.toFixed(2),
+                            currency_code: "MXN"
+                        },
+                        quantity: item.quantity.toString()
+                    }))
+                }],
+                application_context: {
+                    shipping_preference: 'NO_SHIPPING'
+                }
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // 1. Primero cerramos el sandbox de PayPal
+                const paypalContainer = document.getElementById('paypal-button-container');
+                paypalContainer.innerHTML = ''; // Esto elimina completamente el botón
+                
+                // 2. Marcamos PayPal como método de pago seleccionado
+                document.getElementById('paypal').checked = true;
+                
+                // 3. Configuramos los datos de PayPal en el formulario
+                const form = document.getElementById('formPedido');
+                
+                if (!document.getElementById('paypal_transaction_id')) {
+                    const transactionId = document.createElement('input');
+                    transactionId.type = 'hidden';
+                    transactionId.name = 'paypal_transaction_id';
+                    transactionId.id = 'paypal_transaction_id';
+                    form.appendChild(transactionId);
+                }
+                
+                if (!document.getElementById('paypal_payer_email')) {
+                    const payerEmail = document.createElement('input');
+                    payerEmail.type = 'hidden';
+                    payerEmail.name = 'paypal_payer_email';
+                    payerEmail.id = 'paypal_payer_email';
+                    form.appendChild(payerEmail);
+                }
+                
+                document.getElementById('paypal_transaction_id').value = details.id;
+                document.getElementById('paypal_payer_email').value = details.payer.email_address;
+                
+                // 4. Mostramos el campo para subir comprobante
+                document.getElementById('comprobante-pago-container').style.display = 'block';
+                
+                // 5. Mostramos mensaje al usuario (después de cerrar el sandbox)
+                setTimeout(() => {
+                    alert('Pago con PayPal completado. Ahora por favor sube una captura del comprobante.');
+                }, 100);
+            });
+        },
+        
+        onError: function(err) {
+            console.error(err);
+            alert('Ocurrió un error al procesar el pago con PayPal. Por favor intenta nuevamente.');
+        },
+        
+        onCancel: function(data) {
+            // Cuando el usuario cancela el pago
+            alert('Has cancelado el pago con PayPal. Puedes intentarlo nuevamente si lo deseas.');
+        }
+    }).render('#paypal-button-container');
+}
+
+// Y actualiza las llamadas a initPayPalButton para pasar el parámetro:
+if (selectedOption === 'Enviar a domicilio') {
+    initPayPalButton(selectedOption);
+}
+
+// Y en el event listener de cambio:
+option.addEventListener('change', function() {
+    selectedOption = this.value;
+    // ... resto del código ...
+    if (this.value === 'Enviar a domicilio') {
+        initPayPalButton(selectedOption);
+    }
+});
+
+// Inicializar el botón de PayPal cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo inicializar PayPal si hay productos en el carrito
+    const cart = getCart();
+    if (cart.length > 0) {
+        initPayPalButton();
+    }
+    
+    // Actualizar cuando cambie el carrito
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            const cart = getCart();
+            if (cart.length > 0) {
+                // Limpiar y recrear el botón de PayPal
+                document.getElementById('paypal-button-container').innerHTML = '';
+                initPayPalButton();
+            }
+        }
+    });
+});
+</script>
+
 
         <script>
 $(document).ready(function() {
@@ -825,7 +1597,174 @@ document.addEventListener('DOMContentLoaded', function() {
     font-style: italic;
 }
 </style>
+<style>
+/* Estilos para el mini carrito */
+#sidebar-cart {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    background: #fff;
+    z-index: 9999;
+    padding: 30px;
+    overflow-y: auto;
+    transition: right 0.3s ease;
+}
 
+#sidebar-cart.active {
+    right: 0;
+}
+
+#sidebar-cart-curtain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+#sidebar-cart-curtain.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.product-item {
+    display: flex;
+    gap: 15px;
+}
+
+.product-item .item-image {
+    width: 80px;
+    height: 80px;
+    display: block;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.product-item .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.qp_row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.quantity-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.quantity-wrap .decrement,
+.quantity-wrap .increment {
+    padding: 5px 10px;
+    cursor: pointer;
+    background: #f5f5f5;
+    border: none;
+}
+
+.quantity-wrap .decrement:hover,
+.quantity-wrap .increment:hover {
+    background: #e0e0e0;
+}
+
+.quantity-wrap input.number {
+    width: 40px;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    text-align: center;
+    padding: 5px 0;
+}
+
+.empty-cart-message {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.remove-item:hover {
+    color: #cc0000;
+}
+
+.nota-especial {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+</style>
+    <style>
+    /* Estilos adicionales para mejorar la presentación */
+    #order-summary small.text-muted {
+        display: block;
+        font-size: 12px;
+        margin-top: 4px;
+        font-style: italic;
+        color: #666;
+    }
+
+    .cart-summary-detail {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 16px;
+    }
+
+    .mb-16 {
+        margin-bottom: 16px;
+    }
+    </style>
+
+<style>
+    /* Estilos opcionales para mejorar la apariencia */
+    .delivery-option {
+        margin-right: 10px;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 250px;
+    }
+
+    .mt-1 {
+        margin-top: 4px;
+    }
+
+    .mt-2 {
+        margin-top: 8px;
+    }
+
+    .mt-3 {
+        margin-top: 16px;
+    }
+
+    .ml-4 {
+        margin-left: 16px;
+    }
+    </style>
 
 <style>
 .empty-cart-message {
