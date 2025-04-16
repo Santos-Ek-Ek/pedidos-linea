@@ -74,9 +74,18 @@ class AuthController extends Controller
     
             if (Auth::attempt($credentials, $remember)) {
                 $request->session()->regenerate();
-    
-                return redirect()->intended(route('productosVenta'))
-                    ->with('success', 'Logged in successfully!');
+                
+                // Verificar si el usuario es un cliente (no administrador)
+                if (Auth::user() instanceof \App\Models\User) {
+                    return redirect()->intended(route('productosVenta'))
+                        ->with('success', 'Logged in successfully!');
+                }
+                
+                // Si no es cliente, cerrar sesión y redirigir
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'No tienes permisos para acceder aquí.',
+                ]);
             }
     
             // Si falla la autenticación

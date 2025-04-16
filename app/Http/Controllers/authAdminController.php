@@ -43,7 +43,7 @@ class authAdminController extends Controller
 
         auth('admin')->login($admin);
 
-        return redirect('administrador/login')->with('success', 'Registro exitoso!');
+        return redirect('administrador/loginAmin')->with('success', 'Registro exitoso!');
     }
       // Mostrar formulario de login
       public function showLoginForm()
@@ -53,36 +53,29 @@ class authAdminController extends Controller
   
       // Procesar el login
       public function login(Request $request)
-      {
-          $validator = Validator::make($request->all(), [
-              'email' => 'required|string|email',
-              'password' => 'required|string',
-          ], [
-              'email.required' => 'El campo email es obligatorio',
-              'email.email' => 'El email debe ser una dirección válida',
-              'password.required' => 'El campo contraseña es obligatorio',
-          ]);
-  
-          if ($validator->fails()) {
-              return redirect()->back()
-                  ->withErrors($validator)
-                  ->withInput();
-          }
-  
-          $credentials = $request->only('email', 'password');
-          $remember = $request->has('remember');
-  
-          if (Auth::guard('admin')->attempt($credentials, $remember)) {
-              $request->session()->regenerate();
-              return redirect()->intended(route('pedidosVista'))
-                  ->with('success', '¡Bienvenido de nuevo!');
-          }
-  
-          return back()->withErrors([
-              'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
-          ])->onlyInput('email');
-      }
-  
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+        return back()->withErrors($validator)->withInput();
+    }
+
+    if (Auth::guard('admin')->attempt([
+        'email' => $request->email,
+        'password' => $request->password
+    ], $request->remember)) {
+        
+        $request->session()->regenerate();
+        return redirect()->intended(route('pedidosVista'));
+    }
+
+    return back()->withErrors([
+        'email' => 'Credenciales incorrectas',
+    ])->onlyInput('email');
+}
       // Cerrar sesión
       public function logout(Request $request)
       {
@@ -91,7 +84,7 @@ class authAdminController extends Controller
           $request->session()->invalidate();
           $request->session()->regenerateToken();
   
-          return redirect('administrador/login')
+          return redirect('administrador/loginAdmin')
               ->with('status', 'Has cerrado sesión correctamente.');
       }
 }

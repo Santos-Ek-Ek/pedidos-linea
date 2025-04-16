@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 class administrador extends Authenticatable
 {
     use HasFactory, Notifiable;
+    protected $guard = 'admin';
 
     protected $table = 'administradores';
 

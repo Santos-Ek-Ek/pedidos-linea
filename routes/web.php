@@ -71,33 +71,33 @@ Route::get('/productosVenta', [ventaProductoController::class, 'index'])->name('
 
 
 Route::prefix('administrador')->group(function () {
-    Route::get('/login', [authAdminController::class, 'showLoginForm'])->name('login');
+    Route::get('/loginAdmin', [authAdminController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [authAdminController::class, 'login'])->name('login.submit');
     Route::post('/logout', [authAdminController::class, 'logout'])->name('logout');
     Route::get('/register', [authAdminController::class, 'showRegisterForm'])->name('admin.register');
     Route::post('/register', [authAdminController::class, 'register'])->name('admin.register.submit');
     
-Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos'])->name('pedidosVista')->middleware('auth');
+Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos'])->name('pedidosVista');
 
-Route::get('/producto', [administracionController::class, 'mostrarProductos'])->middleware('auth');
-Route::post('/productos/agregar', [administracionController::class, 'agregarProductos'])->name('productos.agregar')->middleware('auth');
+Route::get('/producto', [administracionController::class, 'mostrarProductos']);
+Route::post('/productos/agregar', [administracionController::class, 'agregarProductos'])->name('productos.agregar');
 Route::prefix('producto')->group(function () {
 Route::get('/{id}/edit', [administracionController::class, 'editarProducto'])->name('producto.editar');
 Route::put('/{id}', [administracionController::class, 'actualizarProducto'])->name('producto.actualizar');
 Route::put('/{id}/eliminar', [administracionController::class, 'eliminarProducto'])->name('producto.eliminar');
 
-})->middleware('auth');
+})->middleware('admin');
 
-Route::get('/usuarios', [administracionController::class, 'mostrarUsuarios'])->middleware('auth');
-Route::put('/usuarios/{id}', [administracionController::class, 'eliminarUsuario'])->name('user.eliminar')->middleware('auth');
+Route::get('/usuarios', [administracionController::class, 'mostrarUsuarios'])->middleware('admin');
+Route::put('/usuarios/{id}', [administracionController::class, 'eliminarUsuario'])->name('user.eliminar')->middleware('admin');
 
-Route::get('/categorias', [administracionController::class, 'mostrarCategoria'])->middleware('auth');
+Route::get('/categorias', [administracionController::class, 'mostrarCategoria'])->middleware('admin');
 Route::post('/categorias/agregar', [administracionController::class, 'agregarCategoria'])->name('categoria.agregar');
 Route::put('/categorias/eliminar/{id}', [administracionController::class, 'eliminarCategoria'])->name('categoria.eliminar');
 Route::prefix('categorias')->group(function () {
     Route::get('/{id}/edit', [administracionController::class, 'editarCategoria'])->name('categoria.editar');
     Route::put('/{id}', [administracionController::class, 'actualizarCategoria'])->name('categoria.actualizar');
-})->middleware('auth');
+})->middleware('admin');
 });
 
 Route::get('/tickets/{filename}', function ($filename) {
