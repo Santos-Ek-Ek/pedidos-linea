@@ -74,7 +74,7 @@ class authAdminController extends Controller
   
           if (Auth::guard('admin')->attempt($credentials, $remember)) {
               $request->session()->regenerate();
-              return redirect()->intended(url('administrador/pedidos'))
+              return redirect()->intended(route('pedidosVista'))
                   ->with('success', '¡Bienvenido de nuevo!');
           }
   

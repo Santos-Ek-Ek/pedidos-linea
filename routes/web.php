@@ -77,7 +77,7 @@ Route::prefix('administrador')->group(function () {
     Route::get('/register', [authAdminController::class, 'showRegisterForm'])->name('admin.register');
     Route::post('/register', [authAdminController::class, 'register'])->name('admin.register.submit');
     
-Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos'])->middleware('auth');
+Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos'])->name('pedidosVista')->middleware('auth');
 
 Route::get('/producto', [administracionController::class, 'mostrarProductos'])->middleware('auth');
 Route::post('/productos/agregar', [administracionController::class, 'agregarProductos'])->name('productos.agregar')->middleware('auth');
