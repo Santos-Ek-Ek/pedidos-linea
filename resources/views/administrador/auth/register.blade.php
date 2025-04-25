@@ -144,7 +144,7 @@
                 </form>
           <!-- /.social-auth-links -->
           <p class="mb-0">
-            <a href="../administrador/login" class="link-primary text-center"> Ya soy administrador </a>
+            <a href="../administrador/loginAdmin" class="link-primary text-center"> Ya soy administrador </a>
           </p>
         </div>
         <!-- /.register-card-body -->
