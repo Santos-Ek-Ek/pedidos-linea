@@ -43,7 +43,7 @@ class authAdminController extends Controller
 
         auth('admin')->login($admin);
 
-        return redirect('administrador/loginAmin')->with('success', 'Registro exitoso!');
+        return redirect('administrador/loginAdmin')->with('success', 'Registro exitoso!');
     }
       // Mostrar formulario de login
       public function showLoginForm()
