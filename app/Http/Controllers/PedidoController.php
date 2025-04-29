@@ -240,7 +240,8 @@ public function generarReportePedidos(Request $request)
     $pedidos = pedidos::with(['producto' => function($query) {
             $query->select('id', 'nombre');
         }])
-        ->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin])
+        ->whereDate('created_at', '>=', $request->fecha_inicio)
+        ->whereDate('created_at', '<=', $request->fecha_fin)
         ->get();
 
     // Calcular total general correctamente (subtotal * cantidad para cada pedido)
