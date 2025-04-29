@@ -273,10 +273,16 @@ public function generarReportePedidos(Request $request)
         mkdir($publicPath, 0777, true);
     }
 
-    // Guardar el PDF en la carpeta public/reportes
-    $pdf->save($publicPath.'/'.$filename);
+    // Ruta completa del archivo
+    $filePath = $publicPath . '/' . $filename;
 
-    $pdfUrl = asset('reportes/' . $filename);
+    // Eliminar el archivo existente si ya hay uno con el mismo nombre
+    if (file_exists($filePath)) {
+        unlink($filePath);
+    }
+
+    // Guardar el nuevo PDF
+    $pdf->save($filePath);
 
 
     return $pdf->stream($filename);
