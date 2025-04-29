@@ -225,4 +225,43 @@ public function actualizarComprobante(Request $request)
         'new_path' => $path // Opcional: devolver la nueva ruta
     ]);
 }
+
+public function mostrarReportes(){
+    return view ('administrador.reportes');
+}
+
+public function generarReportePedidos(Request $request)
+{
+    $request->validate([
+        'fecha_inicio' => 'required|date',
+        'fecha_fin' => 'required|date|after_or_equal:fecha_inicio'
+    ]);
+
+    $pedidos = pedidos::with(['producto' => function($query) {
+            $query->select('id', 'nombre');
+        }])
+        ->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin])
+        ->get();
+
+    // Calcular total general correctamente (subtotal * cantidad para cada pedido)
+    $totalGeneral = $pedidos->sum(function($pedido) {
+        return $pedido->total * $pedido->cantidad;
+    });
+
+    // Agregar el total calculado a cada pedido para mostrarlo en el PDF
+    $pedidos->each(function($pedido) {
+        $pedido->total_calculado = $pedido->subtotal * $pedido->cantidad;
+    });
+
+    $data = [
+        'pedidos' => $pedidos,
+        'fechaInicio' => $request->fecha_inicio,
+        'fechaFin' => $request->fecha_fin,
+        'totalGeneral' => $totalGeneral
+    ];
+
+    $pdf = PDF::loadView('administrador.reportes.pedidos', $data);
+    
+    return $pdf->download('reporte_ventas_'.$request->fecha_inicio.'_'.$request->fecha_fin.'.pdf');
+}
 }

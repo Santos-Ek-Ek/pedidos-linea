@@ -78,6 +78,7 @@ Route::prefix('administrador')->group(function () {
     Route::post('/register', [authAdminController::class, 'register'])->name('admin.register.submit');
     
 Route::get('/pedidos', [PedidoController::class, 'mostrarPedidos'])->name('pedidosVista');
+Route::get('/reportes', [PedidoController::class, 'mostrarReportes'])->name('reportesVista');
 
 Route::get('/producto', [administracionController::class, 'mostrarProductos']);
 Route::post('/productos/agregar', [administracionController::class, 'agregarProductos'])->name('productos.agregar');
@@ -87,6 +88,9 @@ Route::put('/{id}', [administracionController::class, 'actualizarProducto'])->na
 Route::put('/{id}/eliminar', [administracionController::class, 'eliminarProducto'])->name('producto.eliminar');
 
 })->middleware('admin');
+
+Route::post('/generar-reporte-pedidos', [PedidoController::class, 'generarReportePedidos'])
+    ->name('generar.reporte.pedidos');
 
 Route::get('/usuarios', [administracionController::class, 'mostrarUsuarios'])->middleware('admin');
 Route::put('/usuarios/{id}', [administracionController::class, 'eliminarUsuario'])->name('user.eliminar')->middleware('admin');
