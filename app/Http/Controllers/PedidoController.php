@@ -288,4 +288,55 @@ public function generarReportePedidos(Request $request)
     return $pdf->stream($filename);
 
 }
+
+
+public function obtenerArchivos() {
+    date_default_timezone_set('America/Mexico_City');
+            // Ruta de la carpeta en public/reportesg
+            $carpeta = public_path('reportes');
+
+            // Obtener la lista de archivos en la carpeta
+            $archivos = scandir($carpeta);
+    
+            // Filtrar solo archivos PDF
+            $archivosPdf = array_filter($archivos, function ($archivo) {
+                return pathinfo($archivo, PATHINFO_EXTENSION) === 'pdf';
+            });
+
+            // Formatear la respuesta
+            $respuesta = array_map(function ($archivo) use ($carpeta) {
+                $rutaCompleta = $carpeta . '/' . $archivo;
+                $fechaModificacion = filemtime($rutaCompleta); // Obtener el timestamp de la última modificación
+    $fechaFormateada = date("d-m-Y h:i a", $fechaModificacion); // Formatear la fecha como "d-m-Y h:i a"
+                return [
+                    'name' => basename($archivo),
+                    'url' => asset('reportes/' . $archivo), // Generar la URL completa para el archivo
+                    'fecha'=> $fechaFormateada,
+                    'timestamp' => $fechaModificacion,
+                ];
+            }, $archivosPdf);
+            usort($respuesta, function ($a, $b) {
+                return $b['timestamp'] - $a['timestamp']; // Orden descendente (más reciente primero)
+            });
+            $respuesta = array_map(function ($archivo) {
+                unset($archivo['timestamp']);
+                return $archivo;
+            }, $respuesta);
+
+            return response()->json(array_values($respuesta));
+}
+
+public function verPdf($nombreArchivo)
+{
+    $rutaArchivo = public_path('reportes/' . $nombreArchivo);
+
+    if (file_exists($rutaArchivo)) {
+        return response()->file($rutaArchivo, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $nombreArchivo . '"',
+        ]);
+    }
+
+    return response('Archivo no encontrado', 404);
+}
 }

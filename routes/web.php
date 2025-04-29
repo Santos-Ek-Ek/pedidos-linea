@@ -131,3 +131,8 @@ Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
 
      Route::post('/actualizar-comprobante', [PedidoController::class, 'actualizarComprobante'])
      ->name('actualizar.comprobante')->middleware('auth');
+
+
+     Route::get('/api/reportes', [PedidoController::class, 'obtenerArchivos']);
+
+     Route::get('/ver-pdf/{nombreArchivo}', [PedidoController::class, 'verPdf'])->name('ver.pdf');
