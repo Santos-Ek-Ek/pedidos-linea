@@ -289,7 +289,7 @@ public function generarReportePedidos(Request $request)
         'success' => true,
         'nuevo_reporte' => [
             'name' => $filename,
-            'fecha' => now()->format('Y-m-d H:i:s'),
+            'fecha' => now()->format('d-m-Y h:i a'),
             'url' => asset('reportes/'.$filename)
         ]
     ]);

@@ -149,7 +149,7 @@ Route::get('/reportes', function() {
             if ($file !== '.' && $file !== '..') {
                 $archivos[] = [
                     'name' => $file,
-                    'fecha' => date('Y-m-d H:i:s', filemtime($reportesPath.'/'.$file)),
+                    'fecha' => date('d-m-Y h:i a', filemtime($reportesPath.'/'.$file)),
                     'url' => asset('reportes/'.$file)
                 ];
             }
