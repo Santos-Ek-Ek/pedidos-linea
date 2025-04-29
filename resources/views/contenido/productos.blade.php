@@ -24,6 +24,79 @@
         <link rel="stylesheet" href="assets/css/app.css">
         
     </head>
+    <style>
+    /* Estilos para el texto de descripción - versión simplificada */
+    .desc {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Mostrar solo 3 líneas inicialmente */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: relative;
+        line-height: 1.5em;
+    }
+    
+    .desc.expandido {
+        -webkit-line-clamp: unset;
+        display: block;
+        overflow: visible;
+    }
+    
+    .ver-mas {
+        color: blue;
+        cursor: pointer;
+        text-decoration: underline;
+        display: inline-block;
+        margin-top: 5px;
+        user-select: none;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar el "Ver más" para cada descripción
+    document.querySelectorAll('.ver-mas').forEach(boton => {
+        const descripcion = boton.previousElementSibling;
+        
+        // Solo si la descripción es muy larga
+        if (descripcion.scrollHeight > descripcion.clientHeight) {
+            boton.style.display = 'inline-block';
+            
+            boton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Guardar el estado actual del smooth scroll
+                let smootherWasActive = false;
+                if (window.ScrollSmoother) {
+                    smootherWasActive = !ScrollSmoother.get().paused();
+                    ScrollSmoother.get().paused(true);
+                }
+                
+                // Alternar la clase
+                descripcion.classList.toggle('expandido');
+                
+                // Cambiar texto del botón
+                const isExpanded = descripcion.classList.contains('expandido');
+                this.textContent = isExpanded ? 'Ver menos' : 'Ver más';
+                
+                // Forzar un reflow para asegurar que la transición CSS funcione
+                void descripcion.offsetWidth;
+                
+                // Reactivar el smooth scroll si estaba activo
+                if (window.ScrollSmoother && smootherWasActive) {
+                    // Usar un timeout ligeramente mayor para asegurar que la animación CSS termine
+                    setTimeout(() => {
+                        ScrollSmoother.get().paused(false);
+                    }, 300); // Aumenté el tiempo para asegurar compatibilidad con transiciones CSS
+                }
+            });
+        } else {
+            boton.style.display = 'none';
+        }
+    });
+});
+</script>
 
     <body id="body">
         <!-- Preloader -->
@@ -320,6 +393,9 @@
                         </div>
                         <h4 class="price mb-24">${{ number_format($producto->precio, 2) }}</h4>
                         <p class="lead desc mb-32">{{ $producto->detalle }}</p>
+@if(strlen($producto->detalle) > 150)
+    <span class="ver-mas" style="display: none;">Ver más</span>
+@endif
                         
                         <!-- Campo para notas especiales -->
                         <div class="mb-16">
