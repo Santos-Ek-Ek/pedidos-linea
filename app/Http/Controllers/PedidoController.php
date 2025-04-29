@@ -262,6 +262,23 @@ public function generarReportePedidos(Request $request)
 
     $pdf = PDF::loadView('administrador.reportes.pedidos', $data);
     
-    return $pdf->download('reporte_ventas_'.$request->fecha_inicio.'_'.$request->fecha_fin.'.pdf');
+    $filename = 'reporte_ventas_'.$request->fecha_inicio.'_'.$request->fecha_fin.'.pdf';
+
+    // Ruta donde se guardará el archivo
+    $publicPath = public_path('reportes');
+    
+    // Crear el directorio si no existe
+    if (!file_exists($publicPath)) {
+        mkdir($publicPath, 0777, true);
+    }
+
+    // Guardar el PDF en la carpeta public/reportes
+    $pdf->save($publicPath.'/'.$filename);
+
+    $pdfUrl = asset('reportes/' . $filename);
+
+
+    return $pdf->stream($filename);
+
 }
 }

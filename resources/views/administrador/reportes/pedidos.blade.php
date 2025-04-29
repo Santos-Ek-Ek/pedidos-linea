@@ -41,7 +41,7 @@
                 <td>{{ $pedido->cantidad }}</td>
                 <td>${{ number_format($pedido->total * $pedido->cantidad, 2) }}</td>
                 <td>{{ $pedido->metodo_pago }}</td>
-                <td>{{ \Carbon\Carbon::parse($pedido->fecha)->format('d/m/Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($pedido->created_at)->format('d/m/Y') }}</td>
             </tr>
             @endforeach
         </tbody>
