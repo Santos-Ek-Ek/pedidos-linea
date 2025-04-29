@@ -242,6 +242,7 @@ public function generarReportePedidos(Request $request)
         }])
         ->whereDate('created_at', '>=', $request->fecha_inicio)
         ->whereDate('created_at', '<=', $request->fecha_fin)
+        ->where('estado', '=', 'Enviado')
         ->get();
 
     // Calcular total general correctamente (subtotal * cantidad para cada pedido)
