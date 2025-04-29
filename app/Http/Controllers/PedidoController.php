@@ -285,7 +285,14 @@ public function generarReportePedidos(Request $request)
     $pdf->save($filePath);
 
 
-    return $pdf->stream($filename);
+    return response()->json([
+        'success' => true,
+        'nuevo_reporte' => [
+            'name' => $filename,
+            'fecha' => now()->format('Y-m-d H:i:s'),
+            'url' => asset('reportes/'.$filename)
+        ]
+    ]);
 
 }
 

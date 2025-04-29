@@ -136,3 +136,30 @@ Route::get('/ticketsVer/{filename}', [PedidoController::class, 'showTicket'])
      Route::get('/api/reportes', [PedidoController::class, 'obtenerArchivos']);
 
      Route::get('/ver-pdf/{nombreArchivo}', [PedidoController::class, 'verPdf'])->name('ver.pdf');
+
+
+Route::get('/reportes', function() {
+    $reportesPath = public_path('reportes');
+    $archivos = [];
+    
+    if (file_exists($reportesPath)) {
+        $files = scandir($reportesPath);
+        
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..') {
+                $archivos[] = [
+                    'name' => $file,
+                    'fecha' => date('Y-m-d H:i:s', filemtime($reportesPath.'/'.$file)),
+                    'url' => asset('reportes/'.$file)
+                ];
+            }
+        }
+    }
+    
+    // Ordenar por fecha más reciente primero
+    usort($archivos, function($a, $b) {
+        return strtotime($b['fecha']) - strtotime($a['fecha']);
+    });
+    
+    return response()->json($archivos);
+});
