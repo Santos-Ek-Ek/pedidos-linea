@@ -36,9 +36,17 @@
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h5>Resumen de Reportes</h5>
-                </div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Resumen de Reportes</h5>
+    <div class="input-group" style="width: 300px;">
+        <input type="text" id="filtroReportes" class="form-control" placeholder="Buscar reportes...">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="btnBuscarReportes">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
                 <div class="card-body">
                     <div id="no-results-reportes" style="display: none;">No se encontraron resultados</div>
                     <table class="table" id="tblReporte">
@@ -148,6 +156,52 @@ $(document).ready(function() {
             console.error('Error al cargar reportes:', error);
         }
     }
+});
+
+$(document).ready(function() {
+    // Función para filtrar los reportes
+    function filtrarReportes(termino) {
+        const filas = $('#tblReporte tbody tr');
+        let resultados = 0;
+        
+        filas.each(function() {
+            const textoFila = $(this).text().toLowerCase();
+            if (textoFila.includes(termino.toLowerCase())) {
+                $(this).show();
+                resultados++;
+            } else {
+                $(this).hide();
+            }
+        });
+        
+        if (resultados === 0) {
+            $('#no-results-reportes').show();
+        } else {
+            $('#no-results-reportes').hide();
+        }
+    }
+
+    // Evento para el botón de búsqueda
+    $('#btnBuscarReportes').on('click', function() {
+        const termino = $('#filtroReportes').val();
+        filtrarReportes(termino);
+    });
+    
+    // Evento para tecla Enter en el input
+    $('#filtroReportes').on('keyup', function(e) {
+        if (e.key === 'Enter') {
+            const termino = $(this).val();
+            filtrarReportes(termino);
+        }
+    });
+    
+    // Evento para limpiar el filtro cuando el input está vacío
+    $('#filtroReportes').on('input', function() {
+        if ($(this).val() === '') {
+            $('#tblReporte tbody tr').show();
+            $('#no-results-reportes').hide();
+        }
+    });
 });
 </script>
 @endsection
